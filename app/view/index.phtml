@@ -4,7 +4,8 @@
     <a href="<?php echo App::config("url")."admin/login" ?>">Login</a>
     <a href="<?php echo App::config("url")."admin/registration" ?>">Registration</a>
 <?php else: ?>
-    <a href="<?php echo App::config("url")."admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+    <a href="<?php echo App::config("url")."admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a><br>
+    <a href="<?php echo App::config("url")."admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
 <?php endif; ?>
 
 

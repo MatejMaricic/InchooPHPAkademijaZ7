@@ -1,0 +1,40 @@
+<?php $user_id = Session::getInstance()->getUser()->id ;
+            $user = User::userData($user_id);
+
+
+?>
+
+<h3>Current user data</h3>
+
+First Name: <?php echo $user->firstname; ?><br><hr>
+Last name: <?php echo $user->lastname; ?><br><hr>
+Email: <?php echo $user->email; ?><br><hr>
+
+
+<form method="post" action="<?php echo App::config('url') ?>admin/edit">
+    <h2>Change your user data</h2>
+    <div class="form-group">
+
+        <label for="firstname">First name</label>
+        <input type="firstname" name="firstname">
+
+
+        <label for="lastname">Last name</label>
+        <input type="lastname" name="lastname">
+
+        <label for="email">Email</label>
+        <input type="email" name="email">
+
+        <label for="new_password">Password</label>
+        <input type="new_password" name="new_pass">
+
+        <label for="new_password_conf">Confirm password</label>
+        <input type="new_password_conf" name="new_pass_conf">
+
+        <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Edit data</button>
+
+</form>

@@ -11,6 +11,15 @@ class AdminController
             "message" => ""
         ]);
     }
+    public function editor()
+    {
+
+
+        $view = new View();
+        $view->render('edit', [
+            "message" => ""
+        ]);
+    }
 
     public function registration()
     {
@@ -148,6 +157,14 @@ class AdminController
         $view->render('index', [
             "posts" => $posts
         ]);
+    }
+
+    public function editUser()
+    {
+        $data =$_POST;
+
+
+
     }
 
     function bulkinsert()
