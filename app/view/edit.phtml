@@ -5,11 +5,26 @@
 ?>
 
 <h3>Current user data</h3>
+Profile image<br>
+<?php if($user->getImage()):?>
+    <img class="card-img-top" width="100" height="100" src="<?php echo App::config('url').'app/img/'.$user->getImage(); ?>">
+<?php endif;?><br><hr>
+    <img width="100" height="100" src="<?php echo App::config('url').'app/view/barcode.php?text='.$user->getemail()?>">
 
 First Name: <?php echo $user->firstname; ?><br><hr>
 Last name: <?php echo $user->lastname; ?><br><hr>
 Email: <?php echo $user->email; ?><br><hr>
 
+
+    <form method="post" action="<?php echo App::config('url') ?>Admin/updateImage"
+          enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image">Change image</label>
+            <input type="file" name="image" id="image">
+            <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Dodaj</button>
+    </form>
 
 <form method="post" action="<?php echo App::config('url') ?>admin/edit">
     <h2>Change your user data</h2>
@@ -26,10 +41,10 @@ Email: <?php echo $user->email; ?><br><hr>
         <input type="email" name="email">
 
         <label for="new_password">Password</label>
-        <input type="new_password" name="new_pass">
+        <input type="password" name="new_pass">
 
         <label for="new_password_conf">Confirm password</label>
-        <input type="new_password_conf" name="new_pass_conf">
+        <input type="password" name="new_pass_conf">
 
         <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
 
@@ -38,3 +53,6 @@ Email: <?php echo $user->email; ?><br><hr>
     <button type="submit" class="btn btn-primary">Edit data</button>
 
 </form>
+<?php if (isset($_GET['error'])): echo$_GET['error'];
+
+endif;?>

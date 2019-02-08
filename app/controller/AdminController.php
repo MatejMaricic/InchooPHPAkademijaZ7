@@ -30,12 +30,16 @@ class AdminController
 
     public function register()
     {
+        $data = $_POST;
+        $uploadImage = $this->uploadImage( $data );
+        $imageName = ($uploadImage) ? $uploadImage : null;
 
         $db = Db::connect();
-        $statement = $db->prepare("insert into user (firstname,lastname,email,pass) values (:firstname,:lastname,:email,:pass)");
+        $statement = $db->prepare("insert into user (firstname,lastname,email,pass, image) values (:firstname,:lastname,:email,:pass, :image)");
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
+        $statement->bindValue('image',$imageName);
         $statement->bindValue('pass', password_hash(Request::post("pass"),PASSWORD_DEFAULT));
         $statement->execute();
 
@@ -43,6 +47,22 @@ class AdminController
         $view = new View();
         $view->render('login',["message"=>""]);
        
+    }
+
+    public function updateImage()
+
+    {
+        $data = $_POST;
+        $uploadImage = $this->uploadImage( $data );
+        $imageName = ($uploadImage) ? $uploadImage : null;
+
+        $db = Db::connect();
+        $statement = $db->prepare("UPDATE user SET image =:image where id = :id ");
+        $statement->bindValue('id',Request::post("post_id"));
+        $statement->bindValue('image',$imageName);
+        $statement->execute();
+
+        header('Location: ' . App::config('url'). 'admin/editor');
     }
 
     public function delete($post)
@@ -159,12 +179,20 @@ class AdminController
         ]);
     }
 
-    public function editUser()
+    public function edit()
     {
-        $data =$_POST;
+        $data = $_POST;
 
+        if ($data['firstname'] == '' || $data['lastname'] == ''){
+            $error = "morate unjeti ime i prezime";
+            header('Location: ' . App::config('url') . 'admin/editor?error='.$error);
 
-
+        }
+        if ($data['new_pass'] !== $data['new_pass_conf']){
+            $error = "Niste upisali isti password";
+            header('Location: ' . App::config('url') . 'admin/editor?error='.$error);
+        }
+        return  var_dump($data);
     }
 
     function bulkinsert()
@@ -188,6 +216,31 @@ class AdminController
         }
 
 
+    }
+
+    private function uploadImage( $data ) {
+        $target_dir    = App::config('uploads_folder');
+        $target_file   = $target_dir . basename( $_FILES["image"]["name"] );
+        $uploadOk      = false;
+
+        $imageFileType = strtolower( pathinfo( $target_file, PATHINFO_EXTENSION ) );
+        $check = getimagesize( $_FILES["image"]["tmp_name"] );
+
+        $uploadOk = ( $check ) ? true : $uploadOk;
+
+        if ( $imageFileType != "jpg" &&  $imageFileType != "jpeg" ) {
+            $uploadOk = false;
+        }
+
+        if ( ! $uploadOk  ) {
+            return false;
+        } else {
+            if ( move_uploaded_file( $_FILES["image"]["tmp_name"], $target_file ) ) {
+                return basename( $_FILES["image"]["name"] );
+            } else {
+                return false;
+            }
+        }
     }
 
    

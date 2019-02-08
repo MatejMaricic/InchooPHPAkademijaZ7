@@ -10,14 +10,17 @@ class User
 
     private $email;
 
+    private $image;
 
 
-    public function __construct($id, $firstname, $lastname, $email)
+
+    public function __construct($id, $firstname, $lastname, $email, $image)
     {
         $this->setId($id);
         $this->setFirstname($firstname);
         $this->setLastname($lastname);
         $this->setEmail($email);
+        $this->setImage($image);
     }
 
 
@@ -54,7 +57,7 @@ class User
         $statement->bindValue('user_id', $user_id);
         $statement->execute();
         foreach ($statement->fetchAll() as $user) {
-            $list = new User($user->id, $user->firstname, $user->lastname, $user->email);
+            $list = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image);
         }
         return $list;
 
