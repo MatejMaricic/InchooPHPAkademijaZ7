@@ -31,16 +31,12 @@ class AdminController
 
     public function register()
     {
-        $data = $_POST;
-        $uploadImage = $this->uploadImage($data);
-        $imageName = ($uploadImage) ? $uploadImage : null;
 
         $db = Db::connect();
         $statement = $db->prepare("insert into user (firstname,lastname,email,pass, image) values (:firstname,:lastname,:email,:pass, :image)");
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
-        $statement->bindValue('image', $imageName);
         $statement->bindValue('pass', password_hash(Request::post("pass"), PASSWORD_DEFAULT));
         $statement->execute();
 
@@ -68,9 +64,11 @@ class AdminController
 
     public function updateInfo()
     {
-        $data = $_POST;
+        $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_STRING );
+        $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING );
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL );
 
-        if ($data['firstname'] === '' || $data['lastname'] === '' || $data['email']) {
+        if ($firstname === '' || $lastname === '' || $email === '') {
             $check = false;
             $msg = "Polja moraju biti ispunjena";
         } else {
@@ -81,10 +79,10 @@ class AdminController
         if ($check === true) {
             $db = Db::connect();
             $statement = $db->prepare("UPDATE user set firstname = :firstname, lastname = :lastname, email=:email where id=:id LIMIT 1");
-            $statement->bindValue('firstname', $data['firstname']);
-            $statement->bindValue('email', $data['email']);
-            $statement->bindValue('lastname', $data['lastname']);
-            $statement->bindValue('id', $data['post_id']);
+            $statement->bindValue('firstname', $firstname);
+            $statement->bindValue('email', $email);
+            $statement->bindValue('lastname', $lastname);
+            $statement->bindValue('id',Session::getInstance()->getUser()->id);
 
             $statement->execute();
         }
@@ -94,14 +92,15 @@ class AdminController
 
     public function updatePass()
     {
-        $data = $_POST;
+        $new_pass = filter_input(INPUT_POST, 'new_pass', FILTER_SANITIZE_STRING );
+        $new_pass_conf = filter_input(INPUT_POST, 'new_pass_conf', FILTER_SANITIZE_STRING );
 
-        if ($data['new_pass'] !== '' && $data['new_pass'] === $data['new_pass_conf']) {
+        if ($new_pass !== '' && $new_pass === $new_pass_conf) {
             $msg = "Password uspješno updatean";
             $db = Db::connect();
             $statement = $db->prepare("UPDATE user set  pass=:pass where id=:id LIMIT 1");
-            $statement->bindValue('pass', password_hash($data['new_pass'], PASSWORD_DEFAULT));
-            $statement->bindValue('id', $data['post_id']);
+            $statement->bindValue('pass', password_hash($new_pass, PASSWORD_DEFAULT));
+            $statement->bindValue('id', Session::getInstance()->getUser()->id);
 
             $statement->execute();
 

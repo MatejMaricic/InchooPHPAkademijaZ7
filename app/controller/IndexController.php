@@ -24,18 +24,38 @@ class IndexController
     public function newPost()
     {
         $data = $this->_validate($_POST);
+        $tags = $data['tags'];
+        $exception = "duplicate input";
 
         if ($data === false) {
             header('Location: ' . App::config('url'));
         } else {
-            $connection = Db::connect();
-            $sql = 'INSERT INTO post (content,user) VALUES (:content,:user)';
-            $stmt = $connection->prepare($sql);
-            $stmt->bindValue('content', $data['content']);
-            $stmt->bindValue('user', Session::getInstance()->getUser()->id);
-            $stmt->execute();
-            header('Location: ' . App::config('url'));
+            try {
+                $connection = Db::connect();
+                $sql = 'INSERT INTO post (content,user) VALUES (:content,:user)';
+                $stmt = $connection->prepare($sql);
+                $stmt->bindValue('content', $data['content']);
+                $stmt->bindValue('user', Session::getInstance()->getUser()->id);
+                $stmt->execute();
+
+                $tags = explode(',', $tags);
+
+                foreach ($tags as $tag) {
+
+                    $sql = 'INSERT INTO tags (content) VALUES (:content)';
+                    $stmt = $connection->prepare($sql);
+                    $stmt->bindValue('content', $tag);
+                    $stmt->execute();
+                }
+
+
+
+            } catch (PDOException $exception) {
+                header('Location: ' . App::config('url'));
+            }
         }
+
+        header('Location: ' . App::config('url'));
     }
 
     /**

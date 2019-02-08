@@ -15,6 +15,8 @@
     <div class="form-group">
         <label for="content">What's on your mind?</label>
         <input id="content" name="content">
+        <label for="tags">Add tags (use , to separate)</label>
+        <input id="tags" name="tags">
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
@@ -50,9 +52,5 @@
 <?php endforeach; ?>
 
 
-<?php //echo password_hash("t", PASSWORD_DEFAULT);
-
-
-?>
 
  <a href="<?php echo App::config("url") ?>admin/bulkinsert">Insert</a>

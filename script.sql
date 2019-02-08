@@ -35,12 +35,7 @@ user int not null,
 post int not null
 )engine=InnoDB;
 
-create table tags(
-id int not null primary key auto_increment,
-content text not null,
-user int not null,
-post int not null
-)engine=InnoDB;
+
 
 
 alter table post add FOREIGN KEY (user) REFERENCES user(id);
