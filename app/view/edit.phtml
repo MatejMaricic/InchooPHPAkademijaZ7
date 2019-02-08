@@ -2,14 +2,20 @@
             $user = User::userData($user_id);
 
 
+
 ?>
 
+<h2 align="center"><?php echo $message ?> </h2>
 <h3>Current user data</h3>
 Profile image<br>
 <?php if($user->getImage()):?>
     <img class="card-img-top" width="100" height="100" src="<?php echo App::config('url').'app/img/'.$user->getImage(); ?>">
+
+<?php else:?>
+    <img src="<?php echo App::config('url').'app/view/barcode.php?size=100&text='.$user->getId() . $user->getfirstname()?>">
+
 <?php endif;?><br><hr>
-    <img width="100" height="100" src="<?php echo App::config('url').'app/view/barcode.php?text='.$user->getemail()?>">
+
 
 First Name: <?php echo $user->firstname; ?><br><hr>
 Last name: <?php echo $user->lastname; ?><br><hr>
@@ -26,7 +32,7 @@ Email: <?php echo $user->email; ?><br><hr>
         <button type="submit" class="btn btn-primary">Dodaj</button>
     </form>
 
-<form method="post" action="<?php echo App::config('url') ?>admin/edit">
+<form method="post" action="<?php echo App::config('url') ?>admin/updateInfo">
     <h2>Change your user data</h2>
     <div class="form-group">
 
@@ -40,11 +46,6 @@ Email: <?php echo $user->email; ?><br><hr>
         <label for="email">Email</label>
         <input type="email" name="email">
 
-        <label for="new_password">Password</label>
-        <input type="password" name="new_pass">
-
-        <label for="new_password_conf">Confirm password</label>
-        <input type="password" name="new_pass_conf">
 
         <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
 
@@ -53,6 +54,27 @@ Email: <?php echo $user->email; ?><br><hr>
     <button type="submit" class="btn btn-primary">Edit data</button>
 
 </form>
-<?php if (isset($_GET['error'])): echo$_GET['error'];
 
-endif;?>
+
+
+    <form method="post" action="<?php echo App::config('url') ?>admin/updatePass">
+        <h2>Change your Password</h2>
+        <div class="form-group">
+
+            <label for="new_password">Password</label>
+            <input type="password" name="new_pass">
+
+            <label for="new_password_conf">Confirm password</label>
+            <input type="password" name="new_pass_conf">
+
+            <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Change</button>
+
+    </form>
+
+
+
+

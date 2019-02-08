@@ -35,6 +35,13 @@ user int not null,
 post int not null
 )engine=InnoDB;
 
+create table tags(
+id int not null primary key auto_increment,
+content text not null,
+user int not null,
+post int not null
+)engine=InnoDB;
+
 
 alter table post add FOREIGN KEY (user) REFERENCES user(id);
 
@@ -45,14 +52,3 @@ alter table likes add FOREIGN KEY (user) REFERENCES user(id);
 alter table likes add FOREIGN KEY (post) REFERENCES post(id);
 
 
-insert into user (id,firstname,lastname,email,pass) values
-(null,'Tomislav','Jakopec','tjakopec@gmail.com','$2y$10$LFXuW6y.P0Zd81fwd..CK.pCd6ZcoT5DsY7rqet9jwzReaoRi7yua');
-
-insert into user (firstname,lastname,email,pass) values
-('Mara','Jakopec','mjakopec@gmail.com','$2y$10$LFXuW6y.P0Zd81fwd..CK.pCd6ZcoT5DsY7rqet9jwzReaoRi7yua');
-
-
-insert into post (content,user) values ('Evo danas pada kiša opet :(',1), ('Jedem jagode.',2);
-
-insert into user (id,firstname,lastname,email,pass) values
-(null,'Tomislav','Jakopec','tjakopec@gmail.com','$2y$10$LFXuW6y.P0Zd81fwd..CK.pCd6ZcoT5DsY7rqet9jwzReaoRi7yua');

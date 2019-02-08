@@ -62,4 +62,16 @@ class User
         return $list;
 
     }
+
+    public static function allUsers()
+    {
+        $list = [];
+        $db = Db::connect();
+        $statement = $db->prepare("select * from user ");
+        $statement->execute();
+        foreach ($statement->fetchAll() as $user) {
+            $list = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image);
+        }
+        return $list;
+    }
 }

@@ -4,13 +4,14 @@ class AdminController
 {
     public function login()
     {
-    
 
-        $view = new View();    
+
+        $view = new View();
         $view->render('login', [
             "message" => ""
         ]);
     }
+
     public function editor()
     {
 
@@ -24,14 +25,14 @@ class AdminController
     public function registration()
     {
         $view = new View();
-        $view->render('registration',["message"=>""]);
-       
+        $view->render('registration', ["message" => ""]);
+
     }
 
     public function register()
     {
         $data = $_POST;
-        $uploadImage = $this->uploadImage( $data );
+        $uploadImage = $this->uploadImage($data);
         $imageName = ($uploadImage) ? $uploadImage : null;
 
         $db = Db::connect();
@@ -39,31 +40,81 @@ class AdminController
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
-        $statement->bindValue('image',$imageName);
-        $statement->bindValue('pass', password_hash(Request::post("pass"),PASSWORD_DEFAULT));
+        $statement->bindValue('image', $imageName);
+        $statement->bindValue('pass', password_hash(Request::post("pass"), PASSWORD_DEFAULT));
         $statement->execute();
 
         Session::getInstance()->logout();
         $view = new View();
-        $view->render('login',["message"=>""]);
-       
+        $view->render('login', ["message" => ""]);
+
     }
 
     public function updateImage()
 
     {
         $data = $_POST;
-        $uploadImage = $this->uploadImage( $data );
+        $uploadImage = $this->uploadImage($data);
         $imageName = ($uploadImage) ? $uploadImage : null;
 
         $db = Db::connect();
         $statement = $db->prepare("UPDATE user SET image =:image where id = :id ");
-        $statement->bindValue('id',Request::post("post_id"));
-        $statement->bindValue('image',$imageName);
+        $statement->bindValue('id', Request::post("post_id"));
+        $statement->bindValue('image', $imageName);
         $statement->execute();
 
-        header('Location: ' . App::config('url'). 'admin/editor');
+        header('Location: ' . App::config('url') . 'admin/editor');
     }
+
+    public function updateInfo()
+    {
+        $data = $_POST;
+
+        if ($data['firstname'] === '' || $data['lastname'] === '' || $data['email']) {
+            $check = false;
+            $msg = "Polja moraju biti ispunjena";
+        } else {
+            $check = true;
+            $msg = "Podaci uspješno updateani";
+        }
+
+        if ($check === true) {
+            $db = Db::connect();
+            $statement = $db->prepare("UPDATE user set firstname = :firstname, lastname = :lastname, email=:email where id=:id LIMIT 1");
+            $statement->bindValue('firstname', $data['firstname']);
+            $statement->bindValue('email', $data['email']);
+            $statement->bindValue('lastname', $data['lastname']);
+            $statement->bindValue('id', $data['post_id']);
+
+            $statement->execute();
+        }
+        $view = new View();
+        $view->render('edit', ["message" => $msg]);
+    }
+
+    public function updatePass()
+    {
+        $data = $_POST;
+
+        if ($data['new_pass'] !== '' && $data['new_pass'] === $data['new_pass_conf']) {
+            $msg = "Password uspješno updatean";
+            $db = Db::connect();
+            $statement = $db->prepare("UPDATE user set  pass=:pass where id=:id LIMIT 1");
+            $statement->bindValue('pass', password_hash($data['new_pass'], PASSWORD_DEFAULT));
+            $statement->bindValue('id', $data['post_id']);
+
+            $statement->execute();
+
+            $view = new View();
+            $view->render('edit', ["message" => $msg]);
+        } else {
+            $msg = "Krivi unos";
+            $view = new View();
+            $view->render('edit', ["message" => $msg]);
+        }
+
+    }
+
 
     public function delete($post)
     {
@@ -80,13 +131,13 @@ class AdminController
 
         $statement = $db->prepare("delete from post where id=:post");
         $statement->bindValue('post', $post);
-    
+
         $statement->execute();
 
         $db->commit();
-        
+
         $this->index();
-       
+
     }
 
     public function comment($post)
@@ -98,13 +149,13 @@ class AdminController
         $statement->bindValue('user', Session::getInstance()->getUser()->id);
         $statement->bindValue('content', Request::post("content"));
         $statement->execute();
-        
+
         $view = new View();
 
         $view->render('view', [
             "post" => Post::find($post)
         ]);
-       
+
     }
 
 
@@ -116,9 +167,9 @@ class AdminController
         $statement->bindValue('post', $post);
         $statement->bindValue('user', Session::getInstance()->getUser()->id);
         $statement->execute();
-        
+
         $this->index();
-       
+
     }
 
 
@@ -131,32 +182,30 @@ class AdminController
         $statement->execute();
 
 
-        if($statement->rowCount()>0){
+        if ($statement->rowCount() > 0) {
             $user = $statement->fetch();
-            if(password_verify(Request::post("password"), $user->pass)){
-              
+            if (password_verify(Request::post("password"), $user->pass)) {
+
                 unset($user->pass);
-                
+
                 Session::getInstance()->login($user);
 
                 $this->index();
-            }else{
+            } else {
                 $view = new View();
-                $view->render('login',["message"=>"Neispravna kombinacija korisničko ime i lozinka"]);
+                $view->render('login', ["message" => "Neispravna kombinacija korisničko ime i lozinka"]);
             }
-        }else{
+        } else {
             $view = new View();
-            $view->render('login',["message"=>"Neispravan email"]);
+            $view->render('login', ["message" => "Neispravan email"]);
         }
 
 
-
-       
     }
 
     public function logout()
     {
-    
+
         Session::getInstance()->logout();
         $this->index();
     }
@@ -165,7 +214,7 @@ class AdminController
     {
 
         $posts = Post::all();
-       //print_r($posts);
+        //print_r($posts);
         echo json_encode($posts);
     }
 
@@ -179,33 +228,18 @@ class AdminController
         ]);
     }
 
-    public function edit()
-    {
-        $data = $_POST;
-
-        if ($data['firstname'] == '' || $data['lastname'] == ''){
-            $error = "morate unjeti ime i prezime";
-            header('Location: ' . App::config('url') . 'admin/editor?error='.$error);
-
-        }
-        if ($data['new_pass'] !== $data['new_pass_conf']){
-            $error = "Niste upisali isti password";
-            header('Location: ' . App::config('url') . 'admin/editor?error='.$error);
-        }
-        return  var_dump($data);
-    }
 
     function bulkinsert()
     {
         $db = Db::connect();
-        for($i=0;$i<1000;$i++){
+        for ($i = 0; $i < 1000; $i++) {
 
             $statement = $db->prepare("insert into post (content,user) values ('DDDD $i',1)");
             $statement->execute();
 
             $id = $db->lastInsertId();
 
-            for($j=0;$j<10;$j++){
+            for ($j = 0; $j < 10; $j++) {
 
                 $statement = $db->prepare("insert into comment (content,user,post) values ('CCCCC $i',1,$id)");
                 $statement->execute();
@@ -218,30 +252,31 @@ class AdminController
 
     }
 
-    private function uploadImage( $data ) {
-        $target_dir    = App::config('uploads_folder');
-        $target_file   = $target_dir . basename( $_FILES["image"]["name"] );
-        $uploadOk      = false;
+    private function uploadImage($data)
+    {
+        $target_dir = App::config('uploads_folder');
+        $target_file = $target_dir . basename($_FILES["image"]["name"]);
+        $uploadOk = false;
 
-        $imageFileType = strtolower( pathinfo( $target_file, PATHINFO_EXTENSION ) );
-        $check = getimagesize( $_FILES["image"]["tmp_name"] );
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $check = getimagesize($_FILES["image"]["tmp_name"]);
 
-        $uploadOk = ( $check ) ? true : $uploadOk;
+        $uploadOk = ($check) ? true : $uploadOk;
 
-        if ( $imageFileType != "jpg" &&  $imageFileType != "jpeg" ) {
+        if ($imageFileType != "jpg" && $imageFileType != "jpeg") {
             $uploadOk = false;
         }
 
-        if ( ! $uploadOk  ) {
+        if (!$uploadOk) {
             return false;
         } else {
-            if ( move_uploaded_file( $_FILES["image"]["tmp_name"], $target_file ) ) {
-                return basename( $_FILES["image"]["name"] );
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                return basename($_FILES["image"]["name"]);
             } else {
                 return false;
             }
         }
     }
 
-   
+
 }
