@@ -16,7 +16,9 @@ class Post
 
     private $userid;
 
-    public function __construct($id, $content, $user,$date, $likes,$comments,$userid)
+    private $tags;
+
+    public function __construct($id, $content, $user,$date, $likes,$comments,$userid, $tags)
     {
         $this->setId($id);
         $this->setContent($content);
@@ -25,6 +27,7 @@ class Post
         $this->setLikes($likes);
         $this->setComments($comments);
         $this->setUserid($userid);
+        $this->setTags($tags);
     }
 
     public function __set($name, $value)
@@ -74,7 +77,13 @@ class Post
             $statement->execute();
             $comments = $statement->fetchAll();
 
-            $list[] = new Post($post->id, $post->content, $post->user,$post->date,$post->likes,$comments,0);
+            $statement = $db->prepare("select d.content, d.id from tags d inner join tag_relations e on d.id=e.tag_id where e.post_id=:id ");
+            $statement->bindValue('id', $post->id);
+            $statement->execute();
+            $tags = $statement->fetchAll();
+
+
+            $list[] = new Post($post->id, $post->content, $post->user,$post->date,$post->likes,$comments,0,$tags);
            // $list[] = $post;
         }
          //   $time2 = microtime(true);
@@ -139,6 +148,11 @@ class Post
         $statement->execute();
         $comments = $statement->fetchAll();
 
-        return new Post($post->id, $post->content, $post->user, $post->date,$post->likes, $comments,$post->userid);
+        $statement = $db->prepare("select d.content, d.id from tags d inner join tag_relations e on d.id=e.tag_id where e.post_id=:id ");
+        $statement->bindValue('id', $id);
+        $statement->execute();
+        $tags = $statement->fetchAll();
+
+        return new Post($post->id, $post->content, $post->user, $post->date,$post->likes, $comments,$post->userid, $tags);
     }
 }

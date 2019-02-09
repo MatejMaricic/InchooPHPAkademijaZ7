@@ -41,10 +41,37 @@ class IndexController
                 $tags = explode(',', $tags);
 
                 foreach ($tags as $tag) {
-
+                    trim($tag);
                     $sql = 'INSERT INTO tags (content) VALUES (:content)';
                     $stmt = $connection->prepare($sql);
                     $stmt->bindValue('content', $tag);
+                    $stmt->execute();
+                }
+
+                $sql = 'SELECT * FROM post WHERE id=(SELECT MAX(id) FROM post) LIMIT 1';
+                $stmt = $connection->prepare($sql);
+                $stmt->execute();
+                $post = $stmt->fetch();
+
+                $tagId=[];
+                foreach ($tags as $tag) {
+
+                    $sql = 'SELECT id FROM tags WHERE content=:tag LIMIT 1';
+                    $stmt = $connection->prepare($sql);
+                    $stmt->bindValue('tag', $tag);
+                    $stmt->execute();
+                    $tagId[] = $stmt->fetch();
+
+                }
+
+
+
+                foreach ($tagId as $tag) {
+
+                    $sql = 'INSERT INTO tag_relations (tag_id, post_id) VALUES (:tag_id, :post_id)';
+                    $stmt = $connection->prepare($sql);
+                    $stmt->bindValue('tag_id', $tag->id);
+                    $stmt->bindValue('post_id', $post->id);
                     $stmt->execute();
                 }
 

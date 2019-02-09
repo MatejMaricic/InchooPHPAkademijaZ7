@@ -18,6 +18,15 @@
     </p>
 <?php endforeach; ?>
 
+<h3>Tags</h3>
+<?php foreach ($post->getTags() as $tag): ?>
+    <p style="margin-left: 20px;">
+        <cite><?= htmlspecialchars($tag->content) ?></cite>
+    </p>
+    <hr />
+<?php endforeach; ?>
+
+
 <?php if( Session::getInstance()->isLoggedIn() ): ?>
 
 <form method="post" action="<?php echo App::config('url') ?>admin/comment/<?php echo $post->getId() ?>">

@@ -29,11 +29,18 @@ class AdminController
 
     }
 
+    public function tags()
+    {
+        $view = new View();
+        $view->render('tags', ["message" => ""]);
+
+    }
+
     public function register()
     {
 
         $db = Db::connect();
-        $statement = $db->prepare("insert into user (firstname,lastname,email,pass, image) values (:firstname,:lastname,:email,:pass, :image)");
+        $statement = $db->prepare("insert into user (firstname,lastname,email,pass) values (:firstname,:lastname,:email,:pass)");
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
@@ -66,7 +73,7 @@ class AdminController
     {
         $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_STRING );
         $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING );
-        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL );
+        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL );
 
         if ($firstname === '' || $lastname === '' || $email === '') {
             $check = false;
@@ -114,6 +121,14 @@ class AdminController
 
     }
 
+    public function tagSearch($id)
+    {
+        $db = Db::connect();
+        $statement = $db->prepare("SELECT * FROM post");
+
+
+    }
+
 
     public function delete($post)
     {
@@ -129,6 +144,9 @@ class AdminController
         $statement->execute();
 
         $statement = $db->prepare("delete from post where id=:post");
+        $statement->bindValue('post', $post);
+
+        $statement = $db->prepare("delete from tag_relations where post_id=:post");
         $statement->bindValue('post', $post);
 
         $statement->execute();

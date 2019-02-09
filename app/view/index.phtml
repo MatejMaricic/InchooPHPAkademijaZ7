@@ -46,6 +46,12 @@
         </p>
     <hr />
     <?php endforeach; ?>
+     <?php foreach ($post->getTags() as $tag): ?>
+         <p style="margin-left: 20px;">
+             <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>"> <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+         </p>
+         <hr />
+     <?php endforeach; ?>
 
 
     </p>

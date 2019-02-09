@@ -35,8 +35,20 @@ user int not null,
 post int not null
 )engine=InnoDB;
 
+create table tag_relations(
+id int not null primary key auto_increment,
+tag_id int not null ,
+post_id int not null
+)engine=InnoDB;
+
+create table tags(
+id int not null primary key auto_increment,
+content varchar (250) not null
+)engine=InnoDB;
 
 
+create unique index tags_content_uindex
+	on tags (content);
 
 alter table post add FOREIGN KEY (user) REFERENCES user(id);
 
@@ -45,5 +57,6 @@ alter table comment add FOREIGN KEY (post) REFERENCES post(id);
 
 alter table likes add FOREIGN KEY (user) REFERENCES user(id);
 alter table likes add FOREIGN KEY (post) REFERENCES post(id);
+
 
 
