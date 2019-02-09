@@ -27,10 +27,14 @@
 
  <?php foreach ($posts as $post): ?>
 
-  <?php if ($post->getReports()->reports === '5' && Session::getInstance()->getUser()->id !== $post->getUserid() ): ?>
+  <?php if (Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getReports()->reports === '5' ): ?>
 
     <h5>Sadržaj je skriven</h5>
+
   <?php else: ?>
+          <?php if ((Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getHidden() === '1')): ?>
+             <h5>Sadržaj je skriven</h5>
+         <?php else: ?>
     <p>
         <cite><?= htmlspecialchars($post->getUser()) ?></cite>
         <?php echo $post->date ?>
@@ -43,6 +47,11 @@
 
             (<?php echo $post->getLikes() ?> likes)
      <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
+            <?php echo $post->getReports()->reports ?>
+            <?php if (Session::getInstance()->getUser()->id == $post->getUserid() ): ?>
+            <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+            <?php endif;?>
+
 
     <?php foreach ($post->getComments() as $comment): ?>
         <p style="margin-left: 20px;">
@@ -53,7 +62,7 @@
         </p>
     <hr />
     <?php endforeach; ?>
-     <?php echo $post->getReports()->reports ?>
+
      <?php foreach ($post->getTags() as $tag): ?>
          <p style="margin-left: 20px;">
              <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>"> <cite><?= htmlspecialchars($tag->content) ?></cite></a>
@@ -63,6 +72,8 @@
 
 
     </p>
+
+         <?php endif;?>
      <?php endif;?>
 <?php endforeach; ?>
 

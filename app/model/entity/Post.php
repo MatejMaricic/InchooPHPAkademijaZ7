@@ -20,7 +20,9 @@ class Post
 
     private $reports;
 
-    public function __construct($id, $content, $user, $date, $likes, $comments, $userid, $tags,$reports)
+    private $hidden;
+
+    public function __construct($id, $content, $user, $date, $likes, $comments, $userid, $tags,$reports,$hidden)
     {
         $this->setId($id);
         $this->setContent($content);
@@ -31,6 +33,7 @@ class Post
         $this->setUserid($userid);
         $this->setTags($tags);
         $this->setReports($reports);
+        $this->setHidden($hidden);
     }
 
     public function __set($name, $value)
@@ -64,7 +67,7 @@ class Post
         $list = [];
         $db = Db::connect();
         $statement = $db->prepare("select 
-        a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date,a.user as userid, 
+        a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date,a.user as userid,a.hidden as hidden, 
         count(c.id) as likes
         from 
         post a inner join user b on a.user=b.id 
@@ -91,7 +94,7 @@ class Post
             $reports = $statement->fetch();
 
 
-            $list[] = new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags,$reports);
+            $list[] = new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags,$reports,$post->hidden);
             // $list[] = $post;
         }
         //   $time2 = microtime(true);
@@ -106,7 +109,7 @@ class Post
         $id = intval($id);
         $db = Db::connect();
         $statement = $db->prepare("select 
-        a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date, a.user as userid, count(c.id) as likes
+        a.id, a.content,a.hidden as hidden, concat(b.firstname, ' ', b.lastname) as user, a.date, a.user as userid, count(c.id) as likes 
         from 
         post a inner join user b on a.user=b.id 
         left join likes c on a.id=c.post 
@@ -125,14 +128,19 @@ class Post
         $statement->execute();
         $tags = $statement->fetchAll();
 
-        return new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags);
+        $statement = $db->prepare("select count(post_id) as reports from report where post_id=:id ");
+        $statement->bindValue('id', $post->id);
+        $statement->execute();
+        $reports = $statement->fetch();
+
+        return new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags,$reports, $post->hidden);
     }
 
     public static function tags($id)
     {
         $id = intval($id);
         $db = Db::connect();
-        $statement = $db->prepare("SELECT a.id,a.content,a.date,a.user as userid, (select count(id) FROM likes WHERE post =a.id ) as likes ,
+        $statement = $db->prepare("SELECT a.id,a.content,a.date,a.hidden as hidden, a.user as userid, (select count(id) FROM likes WHERE post =a.id ) as likes ,
                                             (select concat(firstname,' ',lastname) from user where id=a.user) as user
                                             from post a inner join tag_relations b on a.id=b.post_id  where b.tag_id=:id ");
         $statement->bindValue('id', $id);
@@ -150,8 +158,13 @@ class Post
             $statement->execute();
             $tags = $statement->fetchAll();
 
+            $statement = $db->prepare("select count(post_id) as reports from report where post_id=:id ");
+            $statement->bindValue('id', $post->id);
+            $statement->execute();
+            $reports = $statement->fetch();
 
-            $list[] = new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, 0, $tags);
+
+            $list[] = new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags,$reports,$post->hidden);
 
         }
         return $list;

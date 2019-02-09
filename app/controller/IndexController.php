@@ -32,10 +32,11 @@ class IndexController
         } else {
             try{
                 $connection = Db::connect();
-                $sql = 'INSERT INTO post (content,user) VALUES (:content,:user)';
+                $sql = 'INSERT INTO post (content,user,hidden) VALUES (:content,:user,:hidden)';
                 $stmt = $connection->prepare($sql);
                 $stmt->bindValue('content', $data['content']);
                 $stmt->bindValue('user', Session::getInstance()->getUser()->id);
+                $stmt->bindValue('hidden', 0);
                 $stmt->execute();
             }catch (PDOException $exception){
                 header('Location: ' . App::config('url'));

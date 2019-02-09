@@ -211,6 +211,19 @@ class AdminController
         $this->index();
     }
 
+    public function hide($post)
+    {
+        $val = 1;
+        $db = Db::connect();
+        $statement = $db->prepare("update post set hidden=:hidden where id=:post_id");
+        $statement->bindValue('post_id', $post);
+        $statement->bindValue('hidden',$val);
+        $statement->execute();
+
+        $this->index();
+
+    }
+
 
     public function authorize()
     {
