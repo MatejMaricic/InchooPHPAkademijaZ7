@@ -1,0 +1,24 @@
+
+<?php foreach ($posts as $post): ?>
+    <p>
+    <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+    <?php echo $post->date ?>
+    <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
+        <?= htmlspecialchars($post->getContent()) ?> </a> <br />
+
+    <?php if( Session::getInstance()->isLoggedIn() ): ?>
+        <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+    <?php endif; ?>
+
+    (<?php echo $post->getLikes() ?> likes)
+
+    <?php foreach ($post->getComments() as $comment): ?>
+        <p style="margin-left: 20px;">
+            <cite><?= htmlspecialchars($comment->user) ?></cite>
+            <?php echo $comment->date ?><br />
+            <?php echo $comment->content ?>
+        </p>
+        <hr />
+    <?php endforeach; ?>
+
+<?php endforeach; ?>

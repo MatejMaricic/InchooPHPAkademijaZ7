@@ -30,16 +30,21 @@ class IndexController
         if ($data === false) {
             header('Location: ' . App::config('url'));
         } else {
-            try {
+            try{
                 $connection = Db::connect();
                 $sql = 'INSERT INTO post (content,user) VALUES (:content,:user)';
                 $stmt = $connection->prepare($sql);
                 $stmt->bindValue('content', $data['content']);
                 $stmt->bindValue('user', Session::getInstance()->getUser()->id);
                 $stmt->execute();
+            }catch (PDOException $exception){
+                header('Location: ' . App::config('url'));
+            }
 
-                $tags = explode(',', $tags);
 
+            $tags = explode(',', $tags);
+
+            try{
                 foreach ($tags as $tag) {
                     trim($tag);
                     $sql = 'INSERT INTO tags (content) VALUES (:content)';
@@ -48,12 +53,28 @@ class IndexController
                     $stmt->execute();
                 }
 
+            }catch (PDOException $exception){
+                header('Location: ' . App::config('url'));
+            }
+
+
+            try{
+
                 $sql = 'SELECT * FROM post WHERE id=(SELECT MAX(id) FROM post) LIMIT 1';
                 $stmt = $connection->prepare($sql);
                 $stmt->execute();
                 $post = $stmt->fetch();
 
-                $tagId=[];
+            }catch (PDOException $exception){
+                header('Location: ' . App::config('url'));
+            }
+
+
+
+        $tagId = [];
+
+            try{
+
                 foreach ($tags as $tag) {
 
                     $sql = 'SELECT id FROM tags WHERE content=:tag LIMIT 1';
@@ -64,6 +85,13 @@ class IndexController
 
                 }
 
+            }catch (PDOException $exception){
+                header('Location: ' . App::config('url'));
+            }
+
+
+
+            try{
 
 
                 foreach ($tagId as $tag) {
@@ -75,14 +103,14 @@ class IndexController
                     $stmt->execute();
                 }
 
-
-
-            } catch (PDOException $exception) {
+            }catch (PDOException $exception){
                 header('Location: ' . App::config('url'));
             }
-        }
 
-        header('Location: ' . App::config('url'));
+
+
+            header('Location: ' . App::config('url'));
+        }
     }
 
     /**

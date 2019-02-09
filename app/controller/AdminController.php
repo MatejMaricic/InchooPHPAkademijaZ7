@@ -123,9 +123,10 @@ class AdminController
 
     public function tagSearch($id)
     {
-        $db = Db::connect();
-        $statement = $db->prepare("SELECT * FROM post");
+        $view = new View();
 
+        $view->render('tags', [
+            "posts" => Post::tags($id)]);
 
     }
 
@@ -145,11 +146,12 @@ class AdminController
 
         $statement = $db->prepare("delete from post where id=:post");
         $statement->bindValue('post', $post);
+        $statement->execute();
 
         $statement = $db->prepare("delete from tag_relations where post_id=:post");
         $statement->bindValue('post', $post);
-
         $statement->execute();
+
 
         $db->commit();
 
