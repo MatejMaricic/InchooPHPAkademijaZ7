@@ -190,6 +190,26 @@ class AdminController
         $this->index();
 
     }
+    public function report($post)
+    {
+
+        $id = Session::getInstance()->getUser()->id;
+        $unique_report = $post ."-". $id;
+        md5($unique_report);
+
+        try{
+        $db = Db::connect();
+        $statement = $db->prepare("insert into report (user_id,post_id,unique_report) values (:user_id,:post_id,:unique_report)");
+        $statement->bindValue('post_id', $post);
+        $statement->bindValue('user_id', Session::getInstance()->getUser()->id);
+        $statement->bindValue('unique_report',$unique_report);
+        $statement->execute();
+
+        }catch (PDOException $exception){
+
+        }
+        $this->index();
+    }
 
 
     public function authorize()
