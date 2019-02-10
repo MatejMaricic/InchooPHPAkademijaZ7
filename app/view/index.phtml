@@ -76,7 +76,7 @@
                         <cite><?= htmlspecialchars($tag->content) ?></cite></a>
                 </p>
                 <?php if ($user->getAdmin() === '1'): ?>
-                    <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id ?>">Remove
+                    <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">Remove
                         tag</a>
                 <?php endif; ?>
                 <hr/>

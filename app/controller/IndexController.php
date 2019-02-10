@@ -20,9 +20,11 @@ class IndexController
     public function view($id = 0)
     {
         $view = new View();
-
+        $user = User::userData(Session::getInstance()->getUser()->id);
         $view->render('view', [
-            "post" => Post::find($id)
+            "post" => Post::find($id),
+            "likes" => Post::likes($id),
+            "user" => $user
         ]);
     }
 
@@ -50,18 +52,22 @@ class IndexController
 
             $tags = explode(',', $tags);
 
-            try{
+
                 foreach ($tags as $tag) {
+                    try{
+
                     trim($tag);
                     $sql = 'INSERT INTO tags (content) VALUES (:content)';
                     $stmt = $connection->prepare($sql);
                     $stmt->bindValue('content', $tag);
                     $stmt->execute();
+
+                    }catch (PDOException $exception){
+                        header('Location: ' . App::config('url'));
+                    }
                 }
 
-            }catch (PDOException $exception){
-                header('Location: ' . App::config('url'));
-            }
+
 
 
             try{

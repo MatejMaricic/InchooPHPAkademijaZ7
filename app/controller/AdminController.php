@@ -45,15 +45,15 @@ class AdminController
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
         $statement->bindValue('pass', password_hash(Request::post("pass"), PASSWORD_DEFAULT));
-        $statement->bindValue('admin',0);
+        $statement->bindValue('admin', 0);
         $statement->execute();
 
-        $statement=$db->prepare('SELECT id FROM user WHERE id=(SELECT MAX(id) FROM user) LIMIT 1');
+        $statement = $db->prepare('SELECT id FROM user WHERE id=(SELECT MAX(id) FROM user) LIMIT 1');
         $statement->execute();
         $id = $statement->fetch();
 
-        if ($id->id == 1){
-            $statement=$db->prepare('UPDATE user set admin=:admin  LIMIT 1');
+        if ($id->id == 1) {
+            $statement = $db->prepare('UPDATE user set admin=:admin  LIMIT 1');
             $statement->bindValue('admin', 1);
             $statement->execute();
         }
@@ -61,13 +61,6 @@ class AdminController
         Session::getInstance()->logout();
         $view = new View();
         $view->render('login', ["message" => ""]);
-
-    }
-
-    public function admin()
-
-    {
-
 
     }
 
@@ -89,9 +82,9 @@ class AdminController
 
     public function updateInfo()
     {
-        $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_STRING );
-        $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING );
-        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL );
+        $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_STRING);
+        $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING);
+        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 
         if ($firstname === '' || $lastname === '' || $email === '') {
             $check = false;
@@ -107,7 +100,7 @@ class AdminController
             $statement->bindValue('firstname', $firstname);
             $statement->bindValue('email', $email);
             $statement->bindValue('lastname', $lastname);
-            $statement->bindValue('id',Session::getInstance()->getUser()->id);
+            $statement->bindValue('id', Session::getInstance()->getUser()->id);
 
             $statement->execute();
         }
@@ -117,8 +110,8 @@ class AdminController
 
     public function updatePass()
     {
-        $new_pass = filter_input(INPUT_POST, 'new_pass', FILTER_SANITIZE_STRING );
-        $new_pass_conf = filter_input(INPUT_POST, 'new_pass_conf', FILTER_SANITIZE_STRING );
+        $new_pass = filter_input(INPUT_POST, 'new_pass', FILTER_SANITIZE_STRING);
+        $new_pass_conf = filter_input(INPUT_POST, 'new_pass_conf', FILTER_SANITIZE_STRING);
 
         if ($new_pass !== '' && $new_pass === $new_pass_conf) {
             $msg = "Password uspješno updatean";
@@ -188,9 +181,9 @@ class AdminController
         $statement->execute();
 
         $view = new View();
-
         $view->render('view', [
-            "post" => Post::find($post)
+            "post" => Post::find($post),
+            "likes" => Post::likes($post)
         ]);
 
     }
@@ -199,31 +192,38 @@ class AdminController
     public function like($post)
     {
 
-        $db = Db::connect();
-        $statement = $db->prepare("insert into likes (post,user) values (:post,:user)");
-        $statement->bindValue('post', $post);
-        $statement->bindValue('user', Session::getInstance()->getUser()->id);
-        $statement->execute();
+        $id = Session::getInstance()->getUser()->id;
+        $unique_likes = $post . "-" . $id;
+        try {
+            $db = Db::connect();
+            $statement = $db->prepare("insert into likes (post,user,unique_likes) values (:post,:user,:unique_likes)");
+            $statement->bindValue('post', $post);
+            $statement->bindValue('user', Session::getInstance()->getUser()->id);
+            $statement->bindValue('unique_likes', $unique_likes);
+            $statement->execute();
 
+        } catch (PDOException $exception) {
+
+        }
         $this->index();
 
     }
+
     public function report($post)
     {
 
         $id = Session::getInstance()->getUser()->id;
-        $unique_report = $post ."-". $id;
-        md5($unique_report);
+        $unique_report = $post . "-" . $id;
 
-        try{
-        $db = Db::connect();
-        $statement = $db->prepare("insert into report (user_id,post_id,unique_report) values (:user_id,:post_id,:unique_report)");
-        $statement->bindValue('post_id', $post);
-        $statement->bindValue('user_id', Session::getInstance()->getUser()->id);
-        $statement->bindValue('unique_report',$unique_report);
-        $statement->execute();
+        try {
+            $db = Db::connect();
+            $statement = $db->prepare("insert into report (user_id,post_id,unique_report) values (:user_id,:post_id,:unique_report)");
+            $statement->bindValue('post_id', $post);
+            $statement->bindValue('user_id', Session::getInstance()->getUser()->id);
+            $statement->bindValue('unique_report', $unique_report);
+            $statement->execute();
 
-        }catch (PDOException $exception){
+        } catch (PDOException $exception) {
 
         }
         $this->index();
@@ -235,13 +235,12 @@ class AdminController
         $db = Db::connect();
         $statement = $db->prepare("update post set hidden=:hidden where id=:post_id");
         $statement->bindValue('post_id', $post);
-        $statement->bindValue('hidden',$val);
+        $statement->bindValue('hidden', $val);
         $statement->execute();
 
         $this->index();
 
     }
-
 
 
     public function authorize()
@@ -294,8 +293,8 @@ class AdminController
 
         $posts = Post::all();
         $user = false;
-        if ((Session::getInstance()->isLoggedIn())){
-        $user = User::userData(Session::getInstance()->getUser()->id);
+        if ((Session::getInstance()->isLoggedIn())) {
+            $user = User::userData(Session::getInstance()->getUser()->id);
         }
         $view = new View();
         $view->render('index', [
@@ -304,11 +303,42 @@ class AdminController
 
         ]);
     }
+
     public function deleteComment($id)
     {
         $db = Db::connect();
-        $statement = $db->prepare("delete from comment where post=:id");
+        $statement = $db->prepare("delete from comment where id=:id");
         $statement->bindValue('id', $id);
+        $statement->execute();
+
+        $this->index();
+    }
+
+    public function deleteLike($id)
+    {
+        $id = explode(',', $id);
+        $post_id= $id[0];
+        $unique_like= $id[1];
+
+        $db = Db::connect();
+        $statement = $db->prepare("delete from likes where post=:post_id and unique_likes=:unique_like");
+        $statement->bindValue('post_id', $post_id);
+        $statement->bindValue('unique_like', $unique_like);
+        $statement->execute();
+
+        $this->index();
+    }
+
+    public function removeTag($id)
+    {
+        $id = explode(',', $id);
+        $tag_id= $id[0];
+        $post_id= $id[1];
+
+        $db = Db::connect();
+        $statement = $db->prepare("delete from tag_relations where tag_id=:tag_id and post_id=:post_id");
+        $statement->bindValue('tag_id', $tag_id);
+        $statement->bindValue('post_id', $post_id);
         $statement->execute();
 
         $this->index();

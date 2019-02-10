@@ -26,6 +26,16 @@
     <hr />
 <?php endforeach; ?>
 
+<h3>Likes</h3>
+<?php foreach ($likes as $like): ?>
+
+    <p><?php echo $like->user; ?></p>
+    <?php if ($user->getAdmin() === '1'): ?>
+        <a href="<?php echo App::config('url') ?>admin/deleteLike/<?php echo $post->id . ',' . $like->unique_likes ?>">Delete Like</a>
+    <?php endif; ?>
+
+<?php endforeach;?>
+
 
 <?php if( Session::getInstance()->isLoggedIn() ): ?>
 
@@ -40,3 +50,5 @@
 
 </form>
 <?php endif; ?>
+
+

@@ -170,4 +170,17 @@ class Post
         }
         return $list;
     }
+
+    public static function likes($id)
+    {
+        $likes = [];
+        $id = intval($id);
+        $db = Db::connect();
+        $statement = $db->prepare("SELECT a.unique_likes, concat(b.firstname, ' ', b.lastname) as user from likes a inner join user b on a.user=b.id where a.post =:id ");
+        $statement->bindValue('id', $id);
+        $statement->execute();
+        $likes=$statement->fetchAll();
+        return $likes;
+    }
 }
+

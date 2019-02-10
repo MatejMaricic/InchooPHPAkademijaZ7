@@ -34,7 +34,8 @@ date datetime not null default now()
 create table likes(
 id int not null primary key auto_increment,
 user int not null,
-post int not null
+post int not null,
+unique_likes char(50)
 )engine=InnoDB;
 
 create table tag_relations(
@@ -59,8 +60,12 @@ unique_report varchar (250) not null
 create unique index tags_content_uindex
 	on tags (content);
 
+	create unique index likes_unique_likes_uindex
+	on likes (unique_likes);
+
+
 	create unique index report_unique_report_uindex
-	on tags (content);
+	on report (unique_report);
 
 alter table post add FOREIGN KEY (user) REFERENCES user(id);
 
