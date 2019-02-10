@@ -8,7 +8,8 @@ firstname varchar(50) not null,
 lastname varchar(50) not null,
 email varchar(100) not null,
 pass char(60) not null,
-image varchar (250) default null
+image varchar (250) default null,
+admin int not null
 )engine=InnoDB;
 
 create unique index ix1 on user(email);
@@ -18,7 +19,8 @@ create table post(
 id int not null primary key auto_increment,
 content text,
 user int not null,
-date datetime not null default now()
+date datetime not null default now(),
+hidden int not null
 )engine=InnoDB;
 
 create table comment(
@@ -46,8 +48,18 @@ id int not null primary key auto_increment,
 content varchar (250) not null
 )engine=InnoDB;
 
+create table report(
+id int not null primary key auto_increment,
+user_id int not null,
+post_id int not null,
+unique_report varchar (250) not null
+)engine=InnoDB;
+
 
 create unique index tags_content_uindex
+	on tags (content);
+
+	create unique index report_unique_report_uindex
 	on tags (content);
 
 alter table post add FOREIGN KEY (user) REFERENCES user(id);

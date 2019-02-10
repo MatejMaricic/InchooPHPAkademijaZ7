@@ -12,15 +12,18 @@ class User
 
     private $image;
 
+    private $admin;
 
 
-    public function __construct($id, $firstname, $lastname, $email, $image)
+
+    public function __construct($id, $firstname, $lastname, $email, $image, $admin)
     {
         $this->setId($id);
         $this->setFirstname($firstname);
         $this->setLastname($lastname);
         $this->setEmail($email);
         $this->setImage($image);
+        $this->setAdmin($admin);
     }
 
 
@@ -57,7 +60,7 @@ class User
         $statement->bindValue('user_id', $user_id);
         $statement->execute();
         foreach ($statement->fetchAll() as $user) {
-            $list = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image);
+            $list = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image,$user->admin);
         }
         return $list;
 
@@ -70,7 +73,7 @@ class User
         $statement = $db->prepare("select * from user ");
         $statement->execute();
         foreach ($statement->fetchAll() as $user) {
-            $list = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image);
+            $list[] = new User($user->id, $user->firstname, $user->lastname, $user->email, $user->image,$user->admin);
         }
         return $list;
     }

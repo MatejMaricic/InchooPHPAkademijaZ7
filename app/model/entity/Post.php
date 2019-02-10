@@ -22,6 +22,8 @@ class Post
 
     private $hidden;
 
+
+
     public function __construct($id, $content, $user, $date, $likes, $comments, $userid, $tags,$reports,$hidden)
     {
         $this->setId($id);
@@ -34,6 +36,7 @@ class Post
         $this->setTags($tags);
         $this->setReports($reports);
         $this->setHidden($hidden);
+
     }
 
     public function __set($name, $value)
@@ -62,7 +65,6 @@ class Post
     public static function all()
     {
 
-        // $time=microtime(true);
 
         $list = [];
         $db = Db::connect();
@@ -95,10 +97,9 @@ class Post
 
 
             $list[] = new Post($post->id, $post->content, $post->user, $post->date, $post->likes, $comments, $post->userid, $tags,$reports,$post->hidden);
-            // $list[] = $post;
+
         }
-        //   $time2 = microtime(true);
-        // echo $time2-$time;
+
 
         return $list;
     }

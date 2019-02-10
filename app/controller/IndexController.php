@@ -4,12 +4,17 @@ class IndexController
 {
     public function index()
     {
-        $view = new View();
         $posts = Post::all();
-
+        $user = false;
+        if ((Session::getInstance()->isLoggedIn())){
+            $user = User::userData(Session::getInstance()->getUser()->id);
+        }
+        $view = new View();
         $view->render('index', [
-            "posts" => $posts
-        ]);
+            "posts" => $posts,
+            "user" => $user
+            ]);
+
     }
 
     public function view($id = 0)
@@ -110,7 +115,7 @@ class IndexController
 
 
 
-            header('Location: ' . App::config('url'));
+            $this->index();
         }
     }
 

@@ -24,7 +24,7 @@
 </form>
 <?php endif; ?>
 
-
+ <?php if(Session::getInstance()->isLoggedIn()):?>
  <?php foreach ($posts as $post): ?>
 
   <?php if (Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getReports()->reports === '5' ): ?>
@@ -32,8 +32,10 @@
     <h5>Sadržaj je skriven</h5>
 
   <?php else: ?>
-          <?php if ((Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getHidden() === '1')): ?>
+          <?php if ((Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getHidden() === '1') || $user->getAdmin() !== '1' ): ?>
+
              <h5>Sadržaj je skriven</h5>
+
          <?php else: ?>
     <p>
         <cite><?= htmlspecialchars($post->getUser()) ?></cite>
@@ -76,9 +78,10 @@
          <?php endif;?>
      <?php endif;?>
 <?php endforeach; ?>
+ <?php else: ?>
+
+ <h2>Morate biti ulogirani da bi ste vidjeli sadržaj</h2>
+ <?php endif;?>
 
 
-
-
- <a href="<?php echo App::config("url") ?>admin/bulkinsert">Insert</a>
-
+ <?php var_dump($user)?>

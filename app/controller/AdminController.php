@@ -40,16 +40,34 @@ class AdminController
     {
 
         $db = Db::connect();
-        $statement = $db->prepare("insert into user (firstname,lastname,email,pass) values (:firstname,:lastname,:email,:pass)");
+        $statement = $db->prepare("insert into user (firstname,lastname,email,pass,admin) values (:firstname,:lastname,:email,:pass,:admin)");
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
         $statement->bindValue('pass', password_hash(Request::post("pass"), PASSWORD_DEFAULT));
+        $statement->bindValue('admin',0);
         $statement->execute();
+
+        $statement=$db->prepare('SELECT id FROM user WHERE id=(SELECT MAX(id) FROM user) LIMIT 1');
+        $statement->execute();
+        $id = $statement->fetch();
+
+        if ($id->id == 1){
+            $statement=$db->prepare('UPDATE user set admin=:admin  LIMIT 1');
+            $statement->bindValue('admin', 1);
+            $statement->execute();
+        }
 
         Session::getInstance()->logout();
         $view = new View();
         $view->render('login', ["message" => ""]);
+
+    }
+
+    public function admin()
+
+    {
+
 
     }
 
@@ -274,9 +292,15 @@ class AdminController
     {
 
         $posts = Post::all();
+        $user = false;
+        if ((Session::getInstance()->isLoggedIn())){
+        $user = User::userData(Session::getInstance()->getUser()->id);
+        }
         $view = new View();
         $view->render('index', [
-            "posts" => $posts
+            "posts" => $posts,
+            "user" => $user
+
         ]);
     }
 
