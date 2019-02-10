@@ -304,6 +304,15 @@ class AdminController
 
         ]);
     }
+    public function deleteComment($id)
+    {
+        $db = Db::connect();
+        $statement = $db->prepare("delete from comment where post=:id");
+        $statement->bindValue('id', $id);
+        $statement->execute();
+
+        $this->index();
+    }
 
 
     function bulkinsert()
