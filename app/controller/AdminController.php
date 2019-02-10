@@ -243,6 +243,7 @@ class AdminController
     }
 
 
+
     public function authorize()
     {
 //nedostaju kontrole

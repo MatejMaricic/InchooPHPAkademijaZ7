@@ -36,4 +36,27 @@ class Session
        return isset($_SESSION['is_logged_in']) ? $_SESSION['is_logged_in'] : false;
     }
 
+    public function check($id)
+    {
+        $post = Post::find($id);
+        $check = false;
+        $userid = Session::getInstance()->getUser()->id;
+        $reports = $post->getReports()->reports;
+        $hidden = $post->getHidden();
+        $postuserId = $post->getUserid();
+
+        if ($userid !== $postuserId && $reports === '5') {
+            $check = false;
+        } else {
+            if ($userid !== $postuserId && $hidden === '1') {
+                $check = false;
+            } else {
+                $check = true;
+            }
+        }
+
+        return $check;
+    }
+
+
 }

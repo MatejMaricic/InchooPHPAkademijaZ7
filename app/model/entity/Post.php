@@ -69,7 +69,7 @@ class Post
         $list = [];
         $db = Db::connect();
         $statement = $db->prepare("select 
-        a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date,a.user as userid,a.hidden as hidden, 
+        a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date,a.user as userid,a.hidden, 
         count(c.id) as likes
         from 
         post a inner join user b on a.user=b.id 
@@ -110,7 +110,7 @@ class Post
         $id = intval($id);
         $db = Db::connect();
         $statement = $db->prepare("select 
-        a.id, a.content,a.hidden as hidden, concat(b.firstname, ' ', b.lastname) as user, a.date, a.user as userid, count(c.id) as likes 
+        a.id, a.content,a.hidden, concat(b.firstname, ' ', b.lastname) as user, a.date, a.user as userid, count(c.id) as likes 
         from 
         post a inner join user b on a.user=b.id 
         left join likes c on a.id=c.post 
@@ -141,7 +141,7 @@ class Post
     {
         $id = intval($id);
         $db = Db::connect();
-        $statement = $db->prepare("SELECT a.id,a.content,a.date,a.hidden as hidden, a.user as userid, (select count(id) FROM likes WHERE post =a.id ) as likes ,
+        $statement = $db->prepare("SELECT a.id,a.content,a.date,a.hidden, a.user as userid, (select count(id) FROM likes WHERE post =a.id ) as likes ,
                                             (select concat(firstname,' ',lastname) from user where id=a.user) as user
                                             from post a inner join tag_relations b on a.id=b.post_id  where b.tag_id=:id ");
         $statement->bindValue('id', $id);

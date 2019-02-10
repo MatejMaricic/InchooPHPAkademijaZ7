@@ -1,87 +1,94 @@
-
-
- <?php if(!Session::getInstance()->isLoggedIn()): ?>    
-    <a href="<?php echo App::config("url")."admin/login" ?>">Login</a>
-    <a href="<?php echo App::config("url")."admin/registration" ?>">Registration</a>
+<?php if (!Session::getInstance()->isLoggedIn()): ?>
+    <a href="<?php echo App::config("url") . "admin/login" ?>">Login</a>
+    <a href="<?php echo App::config("url") . "admin/registration" ?>">Registration</a>
 <?php else: ?>
-    <a href="<?php echo App::config("url")."admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a><br>
-    <a href="<?php echo App::config("url")."admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
+    <a href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+    <br>
+    <a href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
 <?php endif; ?>
 
 
-<?php if(Session::getInstance()->isLoggedIn()):?>
-<form method="post" action="<?php echo App::config('url') ?>Index/newPost">
+<?php if (Session::getInstance()->isLoggedIn()): ?>
+    <form method="post" action="<?php echo App::config('url') ?>Index/newPost">
 
-    <div class="form-group">
-        <label for="content">What's on your mind?</label>
-        <input id="content" name="content">
-        <label for="tags">Add tags (use , to separate)</label>
-        <input id="tags" name="tags">
-    </div>
+        <div class="form-group">
+            <label for="content">What's on your mind?</label>
+            <input id="content" name="content">
+            <label for="tags">Add tags (use , to separate)</label>
+            <input id="tags" name="tags">
+        </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary">Save</button>
 
-</form>
+    </form>
 <?php endif; ?>
 
- <?php if(Session::getInstance()->isLoggedIn()):?>
- <?php foreach ($posts as $post): ?>
+<?php if (Session::getInstance()->isLoggedIn()): ?>
 
-  <?php if (Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getReports()->reports === '5' ): ?>
+    <?php foreach ($posts as $post): ?>
 
-    <h5>Sadržaj je skriven</h5>
+        <?php if ($user->getAdmin() !== '1') {
 
-  <?php else: ?>
-          <?php if ((Session::getInstance()->getUser()->id !== $post->getUserid() && $post->getHidden() === '1') || $user->getAdmin() !== '1' ): ?>
+            $check = Session::getInstance()->check($post->id);
+        } else {
+            $check = true;
+        }
 
-             <h5>Sadržaj je skriven</h5>
+         if ($check === false): ?>
+                <h5>Sadržaj je skriven</h5>
+            <?php else: ?>
+            <p>
+            <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+            <?php echo $post->date ?>
+            <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
+                <?= htmlspecialchars($post->getContent()) ?> </a> <br/>
 
-         <?php else: ?>
-    <p>
-        <cite><?= htmlspecialchars($post->getUser()) ?></cite>
-        <?php echo $post->date ?>
-        <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
-            <?= htmlspecialchars($post->getContent()) ?> </a> <br />
-
-            <?php if( Session::getInstance()->isLoggedIn() ): ?>
-            <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+            <?php if (Session::getInstance()->isLoggedIn()): ?>
+                <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
             <?php endif; ?>
 
             (<?php echo $post->getLikes() ?> likes)
-     <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
+
+            <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
             <?php echo $post->getReports()->reports ?>
-            <?php if (Session::getInstance()->getUser()->id == $post->getUserid() ): ?>
-            <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
-            <?php endif;?>
+            <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
+                <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+            <?php endif; ?>
 
 
-    <?php foreach ($post->getComments() as $comment): ?>
-        <p style="margin-left: 20px;">
-            <cite><?= htmlspecialchars($comment->user) ?></cite>
-            <?php echo $comment->date ?><br />
-            <?php echo $comment->content ?>
+            <?php foreach ($post->getComments() as $comment): ?>
+                <p style="margin-left: 20px;">
+                    <cite><?= htmlspecialchars($comment->user) ?></cite>
+                    <?php echo $comment->date ?><br/>
+                    <?php echo $comment->content ?>
+                    <?php if ($user->getAdmin() === '1'): ?>
+                        <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
+                            Comment</a>
+                    <?php endif; ?>
 
-        </p>
-    <hr />
+                </p>
+                <hr/>
+            <?php endforeach; ?>
+
+            <?php foreach ($post->getTags() as $tag): ?>
+                <p style="margin-left: 20px;">
+                    <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                        <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+                </p>
+                <?php if ($user->getAdmin() === '1'): ?>
+                    <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id ?>">Remove
+                        tag</a>
+                <?php endif; ?>
+                <hr/>
+            <?php endforeach; ?>
+
+
+            </p>
+        <?php endif ?>
     <?php endforeach; ?>
+<?php else: ?>
 
-     <?php foreach ($post->getTags() as $tag): ?>
-         <p style="margin-left: 20px;">
-             <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>"> <cite><?= htmlspecialchars($tag->content) ?></cite></a>
-         </p>
-         <hr />
-     <?php endforeach; ?>
+    <h2>Morate biti ulogirani da bi ste vidjeli sadržaj</h2>
+<?php endif; ?>
 
 
-    </p>
-
-         <?php endif;?>
-     <?php endif;?>
-<?php endforeach; ?>
- <?php else: ?>
-
- <h2>Morate biti ulogirani da bi ste vidjeli sadržaj</h2>
- <?php endif;?>
-
-
- <?php var_dump($user)?>
