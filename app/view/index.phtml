@@ -1,94 +1,173 @@
 <?php if (!Session::getInstance()->isLoggedIn()): ?>
-    <a href="<?php echo App::config("url") . "admin/login" ?>">Login</a>
-    <a href="<?php echo App::config("url") . "admin/registration" ?>">Registration</a>
-<?php else: ?>
-    <a href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
-    <br>
-    <a href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
-<?php endif; ?>
 
-
-<?php if (Session::getInstance()->isLoggedIn()): ?>
-    <form method="post" action="<?php echo App::config('url') ?>Index/newPost">
-
-        <div class="form-group">
-            <label for="content">What's on your mind?</label>
-            <input id="content" name="content">
-            <label for="tags">Add tags (use , to separate)</label>
-            <input id="tags" name="tags">
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="<?php echo App::config("url") . "admin/login" ?>">Login</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="<?php echo App::config("url") . "admin/registration" ?>">Registration</a>
+                </li>
+            </ul>
         </div>
+    </nav>
 
-        <button type="submit" class="btn btn-primary">Save</button>
-
-    </form>
-<?php endif; ?>
-
-<?php if (Session::getInstance()->isLoggedIn()): ?>
-
-    <?php foreach ($posts as $post): ?>
-
-        <?php if ($user->getAdmin() !== '1') {
-
-            $check = Session::getInstance()->check($post->id);
-        } else {
-            $check = true;
-        }
-
-         if ($check === false): ?>
-                <h5>Sadržaj je skriven</h5>
-            <?php else: ?>
-            <p>
-            <cite><?= htmlspecialchars($post->getUser()) ?></cite>
-            <?php echo $post->date ?>
-            <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
-                <?= htmlspecialchars($post->getContent()) ?> </a> <br/>
-
-            <?php if (Session::getInstance()->isLoggedIn()): ?>
-                <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
-            <?php endif; ?>
-
-            (<?php echo $post->getLikes() ?> likes)
-
-            <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
-            <?php echo $post->getReports()->reports ?>
-            <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
-                <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
-            <?php endif; ?>
-
-
-            <?php foreach ($post->getComments() as $comment): ?>
-                <p style="margin-left: 20px;">
-                    <cite><?= htmlspecialchars($comment->user) ?></cite>
-                    <?php echo $comment->date ?><br/>
-                    <?php echo $comment->content ?>
-                    <?php if ($user->getAdmin() === '1'): ?>
-                        <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
-                            Comment</a>
-                    <?php endif; ?>
-
-                </p>
-                <hr/>
-            <?php endforeach; ?>
-
-            <?php foreach ($post->getTags() as $tag): ?>
-                <p style="margin-left: 20px;">
-                    <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
-                        <cite><?= htmlspecialchars($tag->content) ?></cite></a>
-                </p>
-                <?php if ($user->getAdmin() === '1'): ?>
-                    <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">Remove
-                        tag</a>
-                <?php endif; ?>
-                <hr/>
-            <?php endforeach; ?>
-
-
-            </p>
-        <?php endif ?>
-    <?php endforeach; ?>
 <?php else: ?>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <h2>Morate biti ulogirani da bi ste vidjeli sadržaj</h2>
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-6">
+
+
+        <?php if (Session::getInstance()->isLoggedIn()): ?>
+
+            <?php foreach ($posts as $post): ?>
+
+                <?php if ($user->getAdmin() !== '1') {
+
+                    $check = Session::getInstance()->check($post->id);
+                } else {
+                    $check = true;
+                }
+
+                if ($check === false): ?>
+                    <h5>Content is hidden</h5>
+                <?php else: ?>
+
+                    <div class="card single-post-card">
+                        <div class="card-body">
+                            <div class="card-title post-title">
+                                <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+                                <?php echo $post->date ?>
+                                <br><br>
+                                <?= htmlspecialchars($post->getContent()) ?> </a>
+                                <br>
+
+                                <hr>
+                            </div>
+
+                            <div class="card-text">
+                                <button class="btn btn-link" type="button" data-toggle="collapse"
+                                        data-target="#comments<?php echo $post->id ?>" aria-expanded="false" aria-controls="collapseExample">
+                                    Show comments
+                                </button>
+
+                                <div class="collapse" id="comments<?php echo $post->id ?>">
+                                    <div class="card card-body">
+                                        <?php foreach ($post->getComments() as $comment): ?>
+                                            <p style="margin-left: 20px;">
+                                                <cite><?= htmlspecialchars($comment->user) ?></cite>
+                                                <?php echo $comment->date ?><br/>
+                                                <?php echo $comment->content ?>
+                                                <?php if ($user->getAdmin() === '1'): ?>
+                                                    <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
+                                                        Comment</a>
+                                                <?php endif; ?>
+
+                                            </p>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <br>
+                                <?php if (Session::getInstance()->isLoggedIn()): ?>
+                                    <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+                                <?php endif; ?>
+
+                                (<?php echo $post->getLikes() ?> likes)
+
+                                <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
+                                <?php echo $post->getReports()->reports ?>
+                                <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
+                                    <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+                                <?php endif; ?>
+                                <br><hr>
+                                Tags:
+                                <?php foreach ($post->getTags() as $tag): ?>
+
+                                        <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                                            <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+
+                                    <?php if ($user->getAdmin() === '1'): ?>
+                                        <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">(remove
+                                            tag)</a> &nbsp;&nbsp;&nbsp;
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                                <hr>
+
+                            </div>
+                            <div class="see-more">
+                                <a  href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?>"
+                                    class="btn btn-primary">See more</a
+                            </div>
+
+
+                        </div>
+                    </div>
+                    </div>
+
+
+                <?php endif ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+
+            <div class="card card-login">
+                <div class="card-body">
+                    You must be logged in to see content
+                </div>
+            </div>
+
+        <?php endif; ?>
+    </div>
+    <div class="col-md-6">
+        <?php if (Session::getInstance()->isLoggedIn()): ?>
+            <div class="card card-submit">
+                <div class="card-header">
+                    Dodaj novi post
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                    <form method="post" action="<?php echo App::config('url') ?>Index/newPost"
+                          enctype="multipart/form-data">
+                        <div class="form-group">
+
+                            <textarea rows="5" cols="50" id="content" name="content" placeholder="What's on your mind?"></textarea>
+                            <label for="tags">Add tags (use , to separate)</label><br>
+                            <input id="tags" name="tags">
+                        </div>
+                        <button type="submit" class="btn btn-primary" >Add</button>
+                    </form>
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
+
+
+    </div>
+</div>
 
 
