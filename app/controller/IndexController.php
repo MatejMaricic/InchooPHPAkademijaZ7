@@ -35,7 +35,7 @@ class IndexController
         $exception = "duplicate input";
 
         if ($data === false) {
-            header('Location: ' . App::config('url'));
+            return json_encode( array('status'=> false, 'msg'=>'can not add'));
         } else {
             try{
                 $connection = Db::connect();
@@ -45,8 +45,9 @@ class IndexController
                 $stmt->bindValue('user', Session::getInstance()->getUser()->id);
                 $stmt->bindValue('hidden', 0);
                 $stmt->execute();
+                $id =  $connection->lastInsertId();
             }catch (PDOException $exception){
-                header('Location: ' . App::config('url'));
+
             }
 
 
@@ -63,7 +64,7 @@ class IndexController
                     $stmt->execute();
 
                     }catch (PDOException $exception){
-                        header('Location: ' . App::config('url'));
+
                     }
                 }
 
@@ -78,7 +79,7 @@ class IndexController
                 $post = $stmt->fetch();
 
             }catch (PDOException $exception){
-                header('Location: ' . App::config('url'));
+
             }
 
 
@@ -98,7 +99,7 @@ class IndexController
                 }
 
             }catch (PDOException $exception){
-                header('Location: ' . App::config('url'));
+
             }
 
 
@@ -116,12 +117,28 @@ class IndexController
                 }
 
             }catch (PDOException $exception){
-                header('Location: ' . App::config('url'));
+
             }
 
 
+            $newEntry = Post::find( $id);
+            $user = User::userData(Session::getInstance()->getUser()->id);
+            $dataReturn = array(
+                'id' => $newEntry->getId(),
+                'content' => $newEntry->getContent(),
+                'date' => $newEntry->getDate(),
+                'user' => $newEntry->getUser(),
+                'likes' => $newEntry->getLikes(),
+                'comments' => $newEntry->geComments(),
+                'userid' => $newEntry->getUserId(),
+                'tags' => $newEntry->getTags(),
+                'reports' => $newEntry->getReports(),
+                'hidden' => $newEntry->getHidden(),
+                'admin' => $user->getAdmin()
 
-            $this->index();
+
+            );
+            return json_encode( array('status'=> true, 'data'=> $dataReturn ) );
         }
     }
 

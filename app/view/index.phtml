@@ -45,7 +45,7 @@
 <?php endif; ?>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 " id="posts_list">
 
 
         <?php if (Session::getInstance()->isLoggedIn()): ?>
@@ -159,8 +159,7 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text">
-                    <form method="post" class="js-post-form" action="<?php echo App::config('url') ?>Index/newPost"
-                          enctype="multipart/form-data">
+                    <form method="post" class="js-new-post-form" enctype="multipart/form-data">
                         <div class="form-group">
 
                             <textarea rows="5" cols="50" id="content" name="content" placeholder="What's on your mind?"></textarea><br>
