@@ -28,6 +28,10 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link"
+                       href="<?php echo App::config("url") ?>">Home </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link"
                        href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
                 </li>
                 <li class="nav-item active">
@@ -56,7 +60,7 @@
                 }
 
                 if ($check === false): ?>
-                    <h5>Content is hidden</h5>
+
                 <?php else: ?>
 
                     <div class="card single-post-card">
@@ -66,6 +70,7 @@
                                 <?php echo $post->date ?>
                                 <br><br>
                                 <?= htmlspecialchars($post->getContent()) ?> </a>
+
                                 <br>
 
                                 <hr>
@@ -104,6 +109,9 @@
                                 <?php echo $post->getReports()->reports ?>
                                 <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
                                     <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+                                <?php if ($post->getHidden() === "1"):?>
+                                    (hidden)
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <br><hr>
                                 Tags:
@@ -155,7 +163,7 @@
                           enctype="multipart/form-data">
                         <div class="form-group">
 
-                            <textarea rows="5" cols="50" id="content" name="content" placeholder="What's on your mind?"></textarea>
+                            <textarea rows="5" cols="50" id="content" name="content" placeholder="What's on your mind?"></textarea><br>
                             <label for="tags">Add tags (use , to separate)</label><br>
                             <input id="tags" name="tags">
                         </div>

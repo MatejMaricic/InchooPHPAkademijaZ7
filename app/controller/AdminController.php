@@ -180,10 +180,16 @@ class AdminController
         $statement->bindValue('content', Request::post("content"));
         $statement->execute();
 
+        $user = false;
+        if ((Session::getInstance()->isLoggedIn())) {
+            $user = User::userData(Session::getInstance()->getUser()->id);
+        }
+
         $view = new View();
         $view->render('view', [
             "post" => Post::find($post),
-            "likes" => Post::likes($post)
+            "likes" => Post::likes($post),
+            "user" => $user
         ]);
 
     }

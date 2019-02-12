@@ -1,60 +1,187 @@
-<a href="<?php echo App::config("url") ?>">Index</a><hr />
+<?php if (!Session::getInstance()->isLoggedIn()): ?>
 
-<?php if( Session::getInstance()->isLoggedIn() &&
-    $post->getUserid()==Session::getInstance()->getUser()->id): ?>
-<a href="<?php echo App::config("url") ?>admin/delete/<?php echo $post->getId() ?>">Delete posts (and all likes and comments</a><br />
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="<?php echo App::config("url") . "admin/login" ?>">Login</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="<?php echo App::config("url") . "admin/registration" ?>">Registration</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+<?php else: ?>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="<?php echo App::config("url") ?>">Home </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
 <?php endif; ?>
 
-<cite><?= htmlspecialchars($post->getUser()) ?></cite>  <?php echo $post->date ?>
-<p><?= htmlspecialchars($post->getContent()) ?></p> Likes: <?php echo $post->getLikes() ?>
+
+<div class="row">
+    <div class=col-md-8>
+        <div class="card single-post-card">
+            <div class="card-body">
+                <div class="card-title post-title">
+                    <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+                    <?php echo $post->date ?>
+                    <br><br>
+                    <?= htmlspecialchars($post->getContent()) ?> </a>
+
+                    <br>
+
+                    <hr>
+                </div>
+
+                <div class="card-text">
+                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                            data-target="#comments<?php echo $post->id ?>" aria-expanded="false"
+                            aria-controls="collapseExample">
+                        Show comments
+                    </button>
+
+                    <div class="collapse" id="comments<?php echo $post->id ?>">
+                        <div class="card card-body">
+                            <?php foreach ($post->getComments() as $comment): ?>
+                                <p style="margin-left: 20px;">
+                                    <cite><?= htmlspecialchars($comment->user) ?></cite>
+                                    <?php echo $comment->date ?><br/>
+                                    <?php echo $comment->content ?>
+                                    <?php if ($user->getAdmin() === '1'): ?>
+                                        <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
+                                            Comment</a>
+                                    <?php endif; ?>
+
+                                </p>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php if (Session::getInstance()->isLoggedIn()): ?>
+
+                        <form method="post"
+                              action="<?php echo App::config('url') ?>admin/comment/<?php echo $post->getId() ?>">
+
+                            <div class="form-group">
+                                <label for="content">New comment</label>
+                                <input id="content" name="content">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Save</button>
+
+                        </form>
+                    <?php endif; ?>
+                    <br>
+                    <?php if (Session::getInstance()->isLoggedIn()): ?>
+                        <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+                    <?php endif; ?>
+
+                    (<?php echo $post->getLikes() ?> likes)
+
+                    <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
+                    <?php echo $post->getReports()->reports ?>
+                    <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
+                        <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+                        <?php if ($post->getHidden() === "1"): ?>
+                            (hidden)
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php if (Session::getInstance()->isLoggedIn() &&
+                        $post->getUserid() == Session::getInstance()->getUser()->id): ?>
+                        <a href="<?php echo App::config("url") ?>admin/delete/<?php echo $post->getId() ?>">Delete posts
+                            (and all likes and comments)</a><br/>
+                    <?php endif; ?>
+                    <br>
+                    <hr>
+                    Tags:
+                    <?php foreach ($post->getTags() as $tag): ?>
+
+                        <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                            <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+
+                        <?php if ($user->getAdmin() === '1'): ?>
+                            <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">(remove
+                                tag)</a> &nbsp;&nbsp;&nbsp;
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <hr>
+
+                </div>
+                <div class="see-more">
+                    <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?>"
+                       class="btn btn-primary">See more</a
+                </div>
 
 
-<h3>Comments</h3>
-<?php foreach ($post->getComments() as $comment): ?>
-    <p>
-        <cite><?= htmlspecialchars($comment->user) ?></cite>
-        <?php echo $comment->date ?><br />
-        <?php echo $comment->content ?>
-    </p>
-<?php endforeach; ?>
-
-<h3>Tags</h3>
-<?php foreach ($post->getTags() as $tag): ?>
-    <p style="margin-left: 20px;">
-        <cite><?= htmlspecialchars($tag->content) ?></cite>
-    </p>
-    <hr />
-<?php endforeach; ?>
-
-<h3>Likes</h3>
-<?php foreach ($likes as $like): ?>
-
-    <p><?php echo $like->user; ?></p>
-    <?php if ($user->getAdmin() === '1'): ?>
-        <a href="<?php echo App::config('url') ?>admin/deleteLike/<?php echo $post->id . ',' . $like->unique_likes ?>">Delete Like</a>
-    <?php endif; ?>
-
-<?php endforeach;?>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-<?php if( Session::getInstance()->isLoggedIn() ): ?>
+<div class="col-md-4"
+<div class="card card-likes">
+    <div class="card-body">
+    <div class="card-title">
+    <h3>Likes</h3>
+    </div>
+    </div>
+    <?php foreach ($likes as $like): ?>
 
-<form method="post" action="<?php echo App::config('url') ?>admin/comment/<?php echo $post->getId() ?>">
+        <p><?php echo $like->user; ?></p>
+        <?php if ($user->getAdmin() === '1'): ?>
+            <a href="<?php echo App::config('url') ?>admin/deleteLike/<?php echo $post->id . ',' . $like->unique_likes ?>">Delete
+                Like</a>
+        <?php endif; ?>
 
-<div class="form-group">
-        <label for="content">New comment</label>
-        <input id="content" name="content">
+    <?php endforeach; ?>
+</div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <br>
+        <div class="fb-share-button"
+             data-href="http://phpakademija.loc/InchooPHPAkademijaZ7/Index/view/<?php echo $post->getId() ?>"
+             data-layout="button" data-size="small" data-mobile-iframe="true"><a target="_blank"
+                                                                                 href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fphpakademija.loc%2FInchooPHPAkademijaZ7%2FIndex%2Fview%2F17&amp;src=sdkpreparse"
+                                                                                 class="fb-xfbml-parse-ignore">Share</a></div>
+        <br>
+
+        <a href="https://plus.google.com/share?url=<?php echo App::config('url') ?>Index/view/<?php echo $post->id ?>" onclick="javascript:window.open(this.href,
+  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
+                    src="https://www.gstatic.com/images/icons/gplus-32.png" alt="Share on Google+"/></a>
+
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
 
-</form>
-<?php endif; ?>
-
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<div class="fb-share-button" data-href="http://phpakademija.loc/InchooPHPAkademijaZ7/Index/view/<?php echo $post->getId() ?>" data-layout="button" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fphpakademija.loc%2FInchooPHPAkademijaZ7%2FIndex%2Fview%2F17&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
-
-<a href="https://plus.google.com/share?url=<?php echo App::config('url') ?>Index/view/<?php echo $post->id?>" onclick="javascript:window.open(this.href,
-  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img
-            src="https://www.gstatic.com/images/icons/gplus-32.png" alt="Share on Google+"/></a>
+</div>

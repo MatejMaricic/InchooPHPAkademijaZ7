@@ -9,4 +9,14 @@
 class ApiController
 {
 
+    public function newPost()
+    {
+        $data = $_POST;
+        $indexController = new IndexController();
+        $savePost = $indexController->newPost($data);
+
+
+
+        die();
+    }
 }

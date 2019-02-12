@@ -1,24 +1,63 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") ?>">Home </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-4">
 
 <?php foreach ($posts as $post): ?>
-    <p>
-    <cite><?= htmlspecialchars($post->getUser()) ?></cite>
-    <?php echo $post->date ?>
-    <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
-        <?= htmlspecialchars($post->getContent()) ?> </a> <br />
+<div class="card">
+    <div class="card-body">
+        <div class="card-title">
+            <?= htmlspecialchars($post->getContent()) ?> </a> <br />
+            <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+            <?php echo $post->date ?>
+            <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?> ">
 
-    <?php if( Session::getInstance()->isLoggedIn() ): ?>
-        <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
-    <?php endif; ?>
 
-    (<?php echo $post->getLikes() ?> likes)
+        </div>
+        <div class="card-text">
+            <?php if( Session::getInstance()->isLoggedIn() ): ?>
+                <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+            <?php endif; ?>
 
-    <?php foreach ($post->getComments() as $comment): ?>
-        <p style="margin-left: 20px;">
-            <cite><?= htmlspecialchars($comment->user) ?></cite>
-            <?php echo $comment->date ?><br />
-            <?php echo $comment->content ?>
-        </p>
-        <hr />
-    <?php endforeach; ?>
+            (<?php echo $post->getLikes() ?> likes)<br>
+                Comments
+            <?php foreach ($post->getComments() as $comment): ?>
+                <p style="margin-left: 20px;">
+                    <cite><?= htmlspecialchars($comment->user) ?></cite>
+                    <?php echo $comment->date ?><br />
+                    <?php echo $comment->content ?>
+                </p>
+                <hr />
+            <?php endforeach; ?>
+        </div>
+
+    </div>
+
+</div>
 
 <?php endforeach; ?>
+
+    </div>
+</div>
