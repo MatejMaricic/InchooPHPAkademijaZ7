@@ -299,8 +299,8 @@ class AdminController
 
     public function index()
     {
-
-        $posts = Post::all();
+        $id = 0;
+        $posts = Post::all($id);
         $user = false;
         if ((Session::getInstance()->isLoggedIn())) {
             $user = User::userData(Session::getInstance()->getUser()->id);

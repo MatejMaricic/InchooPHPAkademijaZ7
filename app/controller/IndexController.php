@@ -2,9 +2,12 @@
 
 class IndexController
 {
+
+    private $pageNumber = 0;
     public function index()
     {
-        $posts = Post::all();
+
+        $posts = Post::all($this->pageNumber);
         $user = false;
         if ((Session::getInstance()->isLoggedIn())){
             $user = User::userData(Session::getInstance()->getUser()->id);
@@ -26,6 +29,12 @@ class IndexController
             "likes" => Post::likes($id),
             "user" => $user
         ]);
+    }
+
+    public function page($page)
+    {
+        $this->pageNumber = $page;
+        $this->index();
     }
 
     public function newPost()

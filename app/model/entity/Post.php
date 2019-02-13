@@ -62,9 +62,13 @@ class Post
         return $this;
     }
 
-    public static function all()
+    public static function all($pageNumber)
     {
+        if ($pageNumber == 0){
 
+        }else{
+            $pageNumber=($pageNumber-1)*5;
+        }
 
         $list = [];
         $db = Db::connect();
@@ -76,7 +80,7 @@ class Post
         left join likes c on a.id=c.post 
         where a.date > ADDDATE(now(), INTERVAL -7 DAY) 
         group by a.id, a.content, concat(b.firstname, ' ', b.lastname), a.date 
-        order by a.date desc limit 10");
+        order by a.date desc limit 5 offset $pageNumber ");
         $statement->execute();
         foreach ($statement->fetchAll() as $post) {
 
@@ -181,6 +185,15 @@ class Post
         $statement->execute();
         $likes=$statement->fetchAll();
         return $likes;
+    }
+
+    public static function countPosts(){
+        $db = Db::connect();
+        $statement = $db->prepare("SELECT count(id) as postCount from post ");
+        $statement->execute();
+        $postCount=$statement->fetch();
+        return $postCount;
+
     }
 }
 

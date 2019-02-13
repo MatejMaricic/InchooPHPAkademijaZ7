@@ -44,6 +44,20 @@
 
 <?php endif; ?>
 
+<?php  $postCount = Post::countPosts()->postCount;
+        $numOfPages = ceil($postCount/5);
+
+?>
+      <?php  for ($i = 1; $i <= $numOfPages; $i++): ?>
+            <?php if ($i == 1): ?>
+            <a href="<?php echo App::config("url")?>">Page <?php echo $i ?></a>
+      <?php else: ?>
+      <a href="<?php echo App::config("url") . "Index/page/". $i ?>">Page <?php echo $i?></a>
+          <?php endif; ?>
+
+<?php endfor;?>
+
+
 <div class="row">
     <div class="col-md-6 " id="posts_list">
 
