@@ -100,10 +100,10 @@
                                 </div>
                                 <br>
                                 <?php if (Session::getInstance()->isLoggedIn()): ?>
-                                    <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+                                    <a value ="<?php echo $post->id ?>" class="js-like" href="<#">Like</a>
                                 <?php endif; ?>
 
-                                (<?php echo $post->getLikes() ?> likes)
+                                <span class="js-likes-num-<?php echo $post->id;?>"><?php echo $post->getLikes() ?></span> likes
 
                                 <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
                                 <?php echo $post->getReports()->reports ?>

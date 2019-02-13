@@ -173,25 +173,24 @@ class AdminController
     public function comment($post)
     {
 
+
         $db = Db::connect();
         $statement = $db->prepare("insert into comment (post,user, content) values (:post,:user,:content)");
-        $statement->bindValue('post', $post);
+        $statement->bindValue('post', $post['id']);
         $statement->bindValue('user', Session::getInstance()->getUser()->id);
-        $statement->bindValue('content', Request::post("content"));
+        $statement->bindValue('content', $post['content']);
         $statement->execute();
 
-        $user = false;
-        if ((Session::getInstance()->isLoggedIn())) {
-            $user = User::userData(Session::getInstance()->getUser()->id);
-        }
 
-        $view = new View();
-        $view->render('view', [
-            "post" => Post::find($post),
-            "likes" => Post::likes($post),
-            "user" => $user
-        ]);
+        $user = User::userData(Session::getInstance()->getUser()->id);
+        $newEntry = Post::find( $post['id']);
+        $dataReturn = array(
+            'comments' => $newEntry->getComments(),
+            'id' => $newEntry->getId(),
+            'admin'=>$user->getAdmin()
 
+        );
+        return json_encode( array('status'=> true, 'data'=> $dataReturn ) );
     }
 
 
@@ -211,8 +210,12 @@ class AdminController
         } catch (PDOException $exception) {
 
         }
-        $this->index();
 
+        $likes = Post::find($post);
+        $getLikes = array(
+            'likes' => $likes->getLikes()
+            );
+        return json_encode( array('status'=> true, 'data'=> $getLikes ) );
     }
 
     public function report($post)
