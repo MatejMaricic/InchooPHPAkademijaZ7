@@ -39,13 +39,18 @@ class AdminController
     public function register()
     {
 
+        $data = $_POST;
+        $uploadImage = $this->uploadImage($data);
+        $imageName = ($uploadImage) ? $uploadImage : null;
+
         $db = Db::connect();
-        $statement = $db->prepare("insert into user (firstname,lastname,email,pass,admin) values (:firstname,:lastname,:email,:pass,:admin)");
+        $statement = $db->prepare("insert into user (firstname,lastname,email,pass,admin,image) values (:firstname,:lastname,:email,:pass,:admin,:image)");
         $statement->bindValue('firstname', Request::post("firstname"));
         $statement->bindValue('lastname', Request::post("lastname"));
         $statement->bindValue('email', Request::post("email"));
         $statement->bindValue('pass', password_hash(Request::post("pass"), PASSWORD_DEFAULT));
         $statement->bindValue('admin', 0);
+        $statement->bindValue('image',$imageName);
         $statement->execute();
 
         $statement = $db->prepare('SELECT id FROM user WHERE id=(SELECT MAX(id) FROM user) LIMIT 1');
@@ -86,7 +91,7 @@ class AdminController
         $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 
-        if ($firstname === '' || $lastname === '' || $email === '') {
+        if ($firstname === '' || $lastname === '' || $email === false) {
             $check = false;
             $msg = "Polja moraju biti ispunjena";
         } else {
@@ -94,7 +99,9 @@ class AdminController
             $msg = "Podaci uspješno updateani";
         }
 
+
         if ($check === true) {
+            try{
             $db = Db::connect();
             $statement = $db->prepare("UPDATE user set firstname = :firstname, lastname = :lastname, email=:email where id=:id LIMIT 1");
             $statement->bindValue('firstname', $firstname);
@@ -103,7 +110,11 @@ class AdminController
             $statement->bindValue('id', Session::getInstance()->getUser()->id);
 
             $statement->execute();
+            }catch (PDOException $exception){
+                $msg = "Email već postoji";
+            }
         }
+
         $view = new View();
         $view->render('edit', ["message" => $msg]);
     }
@@ -114,7 +125,7 @@ class AdminController
         $new_pass_conf = filter_input(INPUT_POST, 'new_pass_conf', FILTER_SANITIZE_STRING);
 
         if ($new_pass !== '' && $new_pass === $new_pass_conf) {
-            $msg = "Password uspješno updatean";
+            $pass_msg = "Password uspješno updatean";
             $db = Db::connect();
             $statement = $db->prepare("UPDATE user set  pass=:pass where id=:id LIMIT 1");
             $statement->bindValue('pass', password_hash($new_pass, PASSWORD_DEFAULT));
@@ -123,11 +134,11 @@ class AdminController
             $statement->execute();
 
             $view = new View();
-            $view->render('edit', ["message" => $msg]);
+            $view->render('edit', ["pass_msg" => $pass_msg]);
         } else {
-            $msg = "Krivi unos";
+            $pass_msg = "Krivi unos";
             $view = new View();
-            $view->render('edit', ["message" => $msg]);
+            $view->render('edit', ["pass_msg" => $pass_msg]);
         }
 
     }

@@ -39,6 +39,20 @@
                        href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
                 </li>
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <div class="inset">
+                        <?php if($user->getImage()):?>
+                            <img class="card-img-top" src="<?php echo App::config('url').'app/img/'.$user->getImage(); ?>">
+
+                        <?php else:?>
+                            <img src="<?php echo App::config('url').'app/view/barcode.php?size=100&text='.$user->getId() . $user->getfirstname()?>">
+
+                        <?php endif;?><br><hr>
+
+                    </div>
+                </li>
+            </ul>
         </div>
     </nav>
 
@@ -48,15 +62,22 @@
         $numOfPages = ceil($postCount/5);
 
 ?>
-      <?php  for ($i = 1; $i <= $numOfPages; $i++): ?>
-            <?php if ($i == 1): ?>
-            <a href="<?php echo App::config("url")?>">Page <?php echo $i ?></a>
-      <?php else: ?>
-      <a href="<?php echo App::config("url") . "Index/page/". $i ?>">Page <?php echo $i?></a>
-          <?php endif; ?>
+<?php if (Session::getInstance()->isLoggedIn()): ?>
+<div class="row justify-content-center">
+    <div class="col-md-4">
 
-<?php endfor;?>
+            <?php  for ($i = 1; $i <= $numOfPages; $i++): ?>
+                <?php if ($i == 1): ?>
+                    <a href="<?php echo App::config("url")?>">Page <?php echo $i ?></a>
+                <?php else: ?>
+                    <a href="<?php echo App::config("url") . "Index/page/". $i ?>">Page <?php echo $i?></a>
+                <?php endif; ?>
 
+            <?php endfor;?>
+
+    </div>
+</div>
+<?php endif;?>
 
 <div class="row">
     <div class="col-md-6 " id="posts_list">

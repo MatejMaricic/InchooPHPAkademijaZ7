@@ -5,11 +5,10 @@
 
 ?>
 
-<h2 align="center"><?php echo $message ?> </h2>
 <h3>Current user data</h3>
 Profile image<br>
 <?php if($user->getImage()):?>
-    <img class="card-img-top" width="100" height="100" src="<?php echo App::config('url').'app/img/'.$user->getImage(); ?>">
+    <img class="card-img-top" src="<?php echo App::config('url').'app/img/'.$user->getImage(); ?>">
 
 <?php else:?>
     <img src="<?php echo App::config('url').'app/view/barcode.php?size=100&text='.$user->getId() . $user->getfirstname()?>">
@@ -29,7 +28,7 @@ Email: <?php echo $user->email; ?><br><hr>
             <input type="file" name="image" id="image">
             <input type="hidden" name="post_id" id="post_id" value="<?php echo $user_id; ?>"/>
         </div>
-        <button type="submit" class="btn btn-primary">Dodaj</button>
+        <button type="submit" class="btn btn-primary">Add</button>
     </form>
 
 <form method="post" action="<?php echo App::config('url') ?>admin/updateInfo">
@@ -55,6 +54,8 @@ Email: <?php echo $user->email; ?><br><hr>
 
 </form>
 
+<?php if (isset($message)): echo $message ?>
+<?php endif;?>
 
 
     <form method="post" action="<?php echo App::config('url') ?>admin/updatePass">
@@ -74,7 +75,8 @@ Email: <?php echo $user->email; ?><br><hr>
         <button type="submit" class="btn btn-primary">Change</button>
 
     </form>
-
+<?php if (isset($pass_msg)): echo $pass_msg ?>
+<?php endif;?>
 
 
 
