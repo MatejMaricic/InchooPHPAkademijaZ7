@@ -30,11 +30,11 @@ class TimelineController
         $data = [];
         foreach ($comments as $comment)
         {
-            $data[$comment->date] = $comment-> user ." commented : " .$comment->content . " at " . $comment->date ;
-        }
+            $data[$comment->date] = $comment-> user ." commented : " .$comment->content;
 
+        }
         foreach ($likes as $like){
-            $data [$like->date] = $like->user . " liked this post " . " at " . $like->date;
+            $data [$like->date] = $like->user . " liked this post ";
         }
         return $data;
 

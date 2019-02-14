@@ -194,10 +194,9 @@ class AdminController
 
 
         $user = User::userData(Session::getInstance()->getUser()->id);
-        $newEntry = Post::find( $post['id']);
+        $newEntry = Post::comment( $post['id']);
         $dataReturn = array(
-            'comments' => $newEntry->getComments(),
-            'id' => $newEntry->getId(),
+            'comments' => $newEntry,
             'admin'=>$user->getAdmin()
 
         );

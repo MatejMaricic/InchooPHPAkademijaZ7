@@ -195,5 +195,16 @@ class Post
         return $postCount;
 
     }
+
+    public static function comment($id)
+    {
+        $db = Db::connect();
+        $statement = $db->prepare("select a.id, a.content, concat(b.firstname, ' ', b.lastname) as user, a.date from comment a inner join user b on a.user=b.id where a.post=:id and a.id= LAST_INSERT_ID() limit 1");
+        $statement->bindValue('id', $id);
+        $statement->execute();
+        $comments = $statement->fetchAll();
+        return $comments;
+
+    }
 }
 

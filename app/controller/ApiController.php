@@ -139,37 +139,25 @@ class ApiController
         $dataAll = json_decode($json);
         $data = $dataAll->data->comments;
         $user =$dataAll->data->admin;
-        $id = $dataAll->data->id;
+        $id = $data[0]->id;
+        $name = $data[0]->user;
+        $date = $data[0]->date;
+        $content = $data[0]->content;
 
         ?>
-
-        <div class="card card-body" >
-            <?php foreach ($data as $comment): ?>
-                <p style="margin-left: 20px;">
-                    <cite><?= htmlspecialchars($comment->user) ?></cite>
-                    <?php echo $comment->date ?><br/>
-                    <?php echo $comment->content ?>
-                    <?php if ($user === '1'): ?>
-                        <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
+        <span>
+        <p style="margin-left: 20px;">
+                    <cite><?= htmlspecialchars($name) ?></cite>
+                    <?php echo $date ?><br/>
+                    <?php echo $content ?>
+            <?php if ($user === '1'): ?>
+                <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $id ?>">Delete
                             Comment</a>
-                    <?php endif; ?>
-
-                </p>
-            <?php endforeach; ?>
-            <?php if (Session::getInstance()->isLoggedIn()): ?>
-
-                <form class="js-new-comment" method="post" action="<?php echo $id ?>">
-
-                    <div class="form-group">
-                        <label for="content">New comment</label>
-                        <input id="content" name="content">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Save</button>
-
-                </form>
             <?php endif; ?>
-        </div>
+
+        </span>
+
+
         <?php
     }
 

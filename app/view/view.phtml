@@ -60,83 +60,75 @@
                     <hr>
                 </div>
 
-                <div class="card-text" id="new-comment">
+                <div class="card-text"  >
 
-                        <div class="card card-body" >
-                            <?php foreach ($post->getComments() as $comment): ?>
-                                <p style="margin-left: 20px;">
-                                    <cite><?= htmlspecialchars($comment->user) ?></cite>
-                                    <?php echo $comment->date ?><br/>
-                                    <?php echo $comment->content ?>
-                                    <?php if ($user->getAdmin() === '1'): ?>
-                                        <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
-                                            Comment</a>
-                                    <?php endif; ?>
+                    <div class="card card-body" id="new-comment" >
+                        <?php foreach ($post->getComments() as $comment): ?>
 
-                                </p>
-                            <?php endforeach; ?>
-                            <?php if (Session::getInstance()->isLoggedIn()): ?>
+                            <p style="margin-left: 20px;">
+                                <cite><?= htmlspecialchars($comment->user) ?></cite>
+                                <?php echo $comment->date ?><br/>
+                                <?php echo $comment->content ?>
+                                <?php if ($user->getAdmin() === '1'): ?>
+                                    <a href="<?php echo App::config('url') ?>admin/deleteComment/<?php echo $comment->id ?>">Delete
+                                        Comment</a>
+                                <?php endif; ?>
 
-                                <form class="js-new-comment" method="post" action="<?php echo $post->getId() ?>">
+                            </p>
+                        <?php endforeach; ?>
+                        <?php if (Session::getInstance()->isLoggedIn()): ?>
 
-                                    <div class="form-group">
-                                        <label for="content">New comment</label>
-                                        <input id="content" name="content">
-                                    </div>
+                            <form class="js-new-comment" method="post" action="<?php echo $post->getId() ?>">
 
-                                    <button type="submit" class="btn btn-primary">Save</button>
+                                <div class="form-group">
+                                    <label for="content">New comment</label>
+                                    <input id="content" name="content">
+                                </div>
 
-                                </form>
-                            <?php endif; ?>
-                        </div>
+                                <button type="submit" class="btn btn-primary">Save</button>
+
+                            </form>
+                        <?php endif; ?>
                     </div>
-
-                    <br>
-                    <?php if (Session::getInstance()->isLoggedIn()): ?>
-                        <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
-                    <?php endif; ?>
-
-                    (<?php echo $post->getLikes() ?> likes)
-
-                    <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
-                    <?php echo $post->getReports()->reports ?>
-                    <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
-                        <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
-                        <?php if ($post->getHidden() === "1"): ?>
-                            (hidden)
-                        <?php endif; ?>
-                    <?php endif; ?>
-                    <?php if (Session::getInstance()->isLoggedIn() &&
-                        $post->getUserid() == Session::getInstance()->getUser()->id): ?>
-                        <a href="<?php echo App::config("url") ?>admin/delete/<?php echo $post->getId() ?>">Delete posts
-                            (and all likes and comments)</a><br/>
-                    <?php endif; ?>
-                    <br>
-                    <hr>
-                    Tags:
-                    <?php foreach ($post->getTags() as $tag): ?>
-
-                        <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
-                            <cite><?= htmlspecialchars($tag->content) ?></cite></a>
-
-                        <?php if ($user->getAdmin() === '1'): ?>
-                            <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">(remove
-                                tag)</a> &nbsp;&nbsp;&nbsp;
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                    <hr>
-
-                </div>
-                <div class="see-more">
-                    <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?>"
-                       class="btn btn-primary">See more</a
                 </div>
 
+                <br>
+                <?php if (Session::getInstance()->isLoggedIn()): ?>
+                    <a href="<?php echo App::config('url') ?>admin/like/<?php echo $post->id ?>">Like</a>
+                <?php endif; ?>
 
+                (<?php echo $post->getLikes() ?> likes)
+
+                <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
+                <?php echo $post->getReports()->reports ?>
+                <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
+                    <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
+                    <?php if ($post->getHidden() === "1"): ?>
+                        (hidden)
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php if (Session::getInstance()->isLoggedIn() &&
+                    $post->getUserid() == Session::getInstance()->getUser()->id): ?>
+                    <a href="<?php echo App::config("url") ?>admin/delete/<?php echo $post->getId() ?>">Delete posts
+                        (and all likes and comments)</a><br/>
+                <?php endif; ?>
+                <br>
+                <hr>
+                Tags:
+                <?php foreach ($post->getTags() as $tag): ?>
+
+                    <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                        <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+
+                    <?php if ($user->getAdmin() === '1'): ?>
+                        <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">(remove
+                            tag)</a> &nbsp;&nbsp;&nbsp;
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <hr>
             </div>
-        </div>
-
     </div>
+</div>
 <div class="col-md-4"
 <div class="card card-likes">
     <div class="card-body">
