@@ -1,0 +1,62 @@
+<?php if (Session::getInstance()->isLoggedIn()): ?>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") ?>">Home </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") . "admin/logout" ?>">Logout <?php echo Session::getInstance()->getUser()->name ?></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link"
+                   href="<?php echo App::config("url") . "admin/editor" ?>">Edit <?php echo Session::getInstance()->getUser()->name ?></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<?php endif;?>
+
+<div class="row">
+    <div class=col-md-4>
+        <div class="card single-post-card">
+            <div class="card-body">
+                <div class="card-title post-title">
+                    <cite><?= htmlspecialchars($post->getUser()) ?></cite>
+                    <?php echo $post->date ?>
+                    <br><br>
+                    <?= htmlspecialchars($post->getContent()) ?> </a><br><hr>
+                </div>
+                <div class="card-text" id="new-comment">
+
+
+                    Tags:
+                    <?php foreach ($post->getTags() as $tag): ?>
+
+                        <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                            <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+
+
+                    <?php endforeach; ?>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php
+            foreach ($timelineContent as $singleEntry):?>
+                <span><?php echo $singleEntry ?></span><br>
+            <?php endforeach;?>
+        </div>
+    </div>
+

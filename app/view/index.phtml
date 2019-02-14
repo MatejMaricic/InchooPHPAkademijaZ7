@@ -113,7 +113,8 @@
 
                             <div class="card-text">
                                 <button class="btn btn-link" type="button" data-toggle="collapse"
-                                        data-target="#comments<?php echo $post->id ?>" aria-expanded="false" aria-controls="collapseExample">
+                                        data-target="#comments<?php echo $post->id ?>" aria-expanded="false"
+                                        aria-controls="collapseExample">
                                     Show comments
                                 </button>
 
@@ -135,25 +136,27 @@
                                 </div>
                                 <br>
                                 <?php if (Session::getInstance()->isLoggedIn()): ?>
-                                    <a value ="<?php echo $post->id ?>" class="js-like" href="<#">Like</a>
+                                    <a value="<?php echo $post->id ?>" class="js-like" href="<#">Like</a>
                                 <?php endif; ?>
 
-                                <span class="js-likes-num-<?php echo $post->id;?>"><?php echo $post->getLikes() ?></span> likes
+                                <span class="js-likes-num-<?php echo $post->id; ?>"><?php echo $post->getLikes() ?></span>
+                                likes
 
                                 <a href="<?php echo App::config('url') ?>admin/report/<?php echo $post->id ?>">Report</a>
                                 <?php echo $post->getReports()->reports ?>
                                 <?php if (Session::getInstance()->getUser()->id == $post->getUserid() || $user->getAdmin() === '1'): ?>
                                     <a href="<?php echo App::config('url') ?>admin/hide/<?php echo $post->id ?>">Hide</a>
-                                <?php if ($post->getHidden() === "1"):?>
-                                    (hidden)
+                                    <?php if ($post->getHidden() === "1"): ?>
+                                        (hidden)
                                     <?php endif; ?>
                                 <?php endif; ?>
-                                <br><hr>
+                                <br>
+                                <hr>
                                 Tags:
                                 <?php foreach ($post->getTags() as $tag): ?>
 
-                                        <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
-                                            <cite><?= htmlspecialchars($tag->content) ?></cite></a>
+                                    <a href="<?php echo App::config('url') ?>admin/tagSearch/<?php echo $tag->id ?>">
+                                        <cite><?= htmlspecialchars($tag->content) ?></cite></a>
 
                                     <?php if ($user->getAdmin() === '1'): ?>
                                         <a href="<?php echo App::config('url') ?>admin/removeTag/<?php echo $tag->id . ',' . $post->id ?>">(remove
@@ -162,15 +165,17 @@
                                 <?php endforeach; ?>
                                 <hr>
 
-                            </div>
-                            <div class="see-more">
-                                <a  href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?>"
-                                    class="btn btn-primary">See more</a
+                                    <a href="<?php echo App::config('url') ?>Index/view/<?= $post->getId() ?>"
+                                        class="btn btn-primary">See more</a>
+                                    <a href="<?php echo App::config('url') ?>Timeline/Timeline/<?= $post->getId() ?>"
+                                        class="btn btn-primary">Timeline</a>
+
+
+
                             </div>
 
 
                         </div>
-                    </div>
                     </div>
 
 
